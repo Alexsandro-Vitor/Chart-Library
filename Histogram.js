@@ -112,23 +112,23 @@ class Histogram extends Chart {
 	 */
 	setData(dataset, colAttributes, onEvents) {
 		var colWidth = this.width / (this.xAxisNames.length+1);
-		var thisHist = this;
+		var thisChart = this;
 		if (colAttributes == null) colAttributes = [];
 		
 		//Adjusting the yScale and axis
 		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, 0, d3.max(dataset));
 		
 		//Mandatory attributes
-		Chart.addIfNull(colAttributes, "id", function(d, i) {return "col" + thisHist.xAxisNames[i];});
+		Chart.addIfNull(colAttributes, "id", function(d, i) {return "col" + thisChart.xAxisNames[i];});
 		colAttributes["class"] = "column";
-		Chart.addIfNull(colAttributes, "x", function(d, i) {return thisHist.xScale(i) - colWidth/2;});
-		Chart.addIfNull(colAttributes, "y", function(d, i) {return thisHist.yScale(d);});
+		Chart.addIfNull(colAttributes, "x", function(d, i) {return thisChart.xScale(i) - colWidth/2;});
+		Chart.addIfNull(colAttributes, "y", function(d, i) {return thisChart.yScale(d);});
 		Chart.addIfNull(colAttributes, "width", colWidth);
-		Chart.addIfNull(colAttributes, "height", function(d, i) {return thisHist.height - thisHist.yScale(d);});
+		Chart.addIfNull(colAttributes, "height", function(d, i) {return thisChart.height - thisChart.yScale(d);});
 		
 		//Column selection and color setting
 		this.colSelection = this.tag.selectAll(".column").data(dataset).enter().append("rect")
-			.attr("fill", function(d, i) {return thisHist.colorScale(i);});
+			.attr("fill", function(d, i) {return thisChart.colorScale(i);});
 		
 		//Setting attributes
 		for (var attrName in colAttributes) {
@@ -150,7 +150,7 @@ class Histogram extends Chart {
 		this.colorScale
 			.domain(sequence)
 			.range(newColors);
-		var thisHist = this;
-		if (this.colSelection != null) this.colSelection.attr("fill", function(d, i) {return thisHist.colorScale(i);});
+		var thisChart = this;
+		if (this.colSelection != null) this.colSelection.attr("fill", function(d, i) {return thisChart.colorScale(i);});
 	}
 }

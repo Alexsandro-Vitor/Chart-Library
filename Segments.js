@@ -79,11 +79,18 @@ class Segments extends Chart {
 		this.rangeSelection = [];
 		
 		/**
-		 * The color scale of the chart. Used to set the colors of each column in the chart
-		 * @member {Object} colorScale
+		 * The color scale for dots on the chart. Used to set the colors of each dotGroup in the chart
+		 * @member {Object} dotColorScale
 		 */
-		this.colorScale = d3.scaleLinear()
-			.range(["red", "green"]);
+		this.dotColorScale = d3.scaleLinear()
+			.range(["red", "blue"]);
+		
+		/**
+		 * The color scale for ranges on the chart. Used to set the colors of each scale in the chart
+		 * @member {Object} rangeColorScale
+		 */
+		this.rangeColorScale = d3.scaleLinear()
+			.range(["yellow", "cyan"]);
 	}
 	
 	/** 
@@ -135,6 +142,53 @@ class Segments extends Chart {
 	}
 	
 	/** 
+	 * Inserts data on the chart as dots and plots it
+	 * @param {number[][]} dataset - An array of arrays for each dot
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the dots
+	 * @param {Object} onEvents - An object containing functions for events
+	 */
+	setDots(dataset, attributes, onEvents) {
+		var thisChart = this;
+		
+		//Mandatory attributes
+		if (attributes == null) attributes = [];
+		Chart.addIfNull(attributes, "id", function(d, i) {return "dotGroup" + i;});
+		attributes["class"] = function(d, i) {return "group" + data + "Dot";};
+		Chart.addIfNull(attributes, "r", "5px");
+		Chart.addIfNull(attributes, "cx", function(d, i) {return thisChart.xScale(i);});
+		Chart.addIfNull(attributes, "cy", function(d, i) {return thisChart.yScale(d);});
+		
+		//Defining the dotColorScale domain
+		var sequence;
+		if (dataset.length > 1) sequence = Chart.genSequence(0, this.dotColorScale.range().length, dataset.length - 1);
+		else sequence = Chart.genSequence(0, this.dotColorScale.range().length, 1);
+		this.dotColorScale.domain(sequence);
+		
+		//Creating the groups
+		this.dotSelection = this.tag.selectAll(".dotGroup").data(dataset).enter().append("g")
+			.attr("id", attributes["id"])
+			.attr("class", "dotGroup");
+		
+		//Creating the dots
+		attributes["id"] = function(d, i) {return "dot" + thisChart.xAxisNames[i];};
+		var dotGroup;
+		for (var data in dataset) {
+			dotGroup = this.dotSelection.selectAll(".group" + data + "Dot").data(dataset[data]).enter().append("circle")
+				.attr("fill", function(d, i) {return thisChart.dotColorScale(data);});
+			
+			//Setting attributes
+			for (var attrName in attributes) {
+				dotGroup.attr(attrName, attributes[attrName]);
+			}
+			
+			//Setting events
+			for (var eventName in onEvents) {
+				dotGroup.on(eventName, onEvents[eventName]);
+			}
+		}
+	}
+	
+	/** 
 	 * Inserts data on the chart as ranges and plots it
 	 * @param {number[][][]} dataset - An array of arrays for each range
 	 * @param {number[][]} dataset[i] - The data used to create one range
@@ -152,11 +206,14 @@ class Segments extends Chart {
 		attributes["class"] = "range";
 		Chart.addIfNull(attributes, "d", function(d, i) {return thisChart.genRangePath(d[0], d[1]);});
 		
+		//Defining the rangeColorScale domain
+		var sequence;
+		if (dataset.length > 1) sequence = Chart.genSequence(0, this.rangeColorScale.range().length, dataset.length - 1);
+		else sequence = Chart.genSequence(0, this.rangeColorScale.range().length, 1);
+		this.rangeColorScale.domain(sequence);
+		
 		this.rangeSelection = this.tag.selectAll(".range").data(dataset).enter().append("path")
-			.attr("fill", function(d, i) {
-				if (dataset.length == 1) return thisChart.colorScale(0);
-				else return thisChart.colorScale(i * thisChart.xScale.domain()[1] / (dataset.length-1));
-			});
+			.attr("fill", function(d, i) {return thisChart.rangeColorScale(i);});
 		
 		//Setting attributes
 		for (var attrName in attributes) {
@@ -203,15 +260,18 @@ class Segments extends Chart {
 	}
 	
 	/** 
-	 * Sets the new colors of the chart. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function
-	 * @param {string[]} newColors - An array of colors for the colorScale to work with
+	 * Sets the new colors of the dotGroups. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function
+	 * @param {string[]} newColors - An array of colors for the dotColorScale to work with
 	 */
-	setColorScale(newColors) {
-		var sequence = Chart.genSequence(0, newColors.length, this.xAxisNames.length-1);
-		this.colorScale
-			.domain(sequence)
-			.range(newColors);
-		var thisHist = this;
-		if (this.colSelection != null) this.colSelection.attr("fill", function(d, i) {return thisHist.colorScale(i);});
+	setDotColorScale(newColors) {
+		this.dotColorScale.range(newColors);
+	}
+	
+	/** 
+	 * Sets the new colors of the chart. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function
+	 * @param {string[]} newColors - An array of colors for the rangeColorScale to work with
+	 */
+	setRangeColorScale(newColors) {
+		this.rangeColorScale.range(newColors);
 	}
 }
