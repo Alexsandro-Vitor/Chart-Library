@@ -107,38 +107,31 @@ class Histogram extends Chart {
 	/** 
 	 * Inserts data on the histogram and plots it
 	 * @param {number[]} dataset - An array of values for the columns
-	 * @param {Object} colAttributes - An object containing functions or constants for attributes of the columns
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the columns
 	 * @param {Object} onEvents - An object containing functions for events
 	 */
-	setData(dataset, colAttributes, onEvents) {
-		var colWidth = this.width / (this.xAxisNames.length+1);
+	setData(dataset, attributes, onEvents) {
+		var colWidth = this.width / (this.xAxisNames.length + 1);
 		var thisChart = this;
-		if (colAttributes == null) colAttributes = [];
+		if (attributes == null) attributes = [];
 		
 		//Adjusting the yScale and axis
 		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, 0, d3.max(dataset));
 		
 		//Mandatory attributes
-		Chart.addIfNull(colAttributes, "id", function(d, i) {return "col" + thisChart.xAxisNames[i];});
-		colAttributes["class"] = "column";
-		Chart.addIfNull(colAttributes, "x", function(d, i) {return thisChart.xScale(i) - colWidth/2;});
-		Chart.addIfNull(colAttributes, "y", function(d, i) {return thisChart.yScale(d);});
-		Chart.addIfNull(colAttributes, "width", colWidth);
-		Chart.addIfNull(colAttributes, "height", function(d, i) {return thisChart.height - thisChart.yScale(d);});
+		Chart.addIfNull(attributes, "id", (d, i)=>("col" + thisChart.xAxisNames[i]));
+		attributes["class"] = "column";
+		Chart.addIfNull(attributes, "x", (d, i)=>(thisChart.xScale(i) - colWidth/2));
+		Chart.addIfNull(attributes, "y", (d, i)=>(thisChart.yScale(d)));
+		Chart.addIfNull(attributes, "width", colWidth);
+		Chart.addIfNull(attributes, "height", (d, i)=>(thisChart.height - thisChart.yScale(d)));
 		
 		//Column selection and color setting
 		this.colSelection = this.tag.selectAll(".column").data(dataset).enter().append("rect")
-			.attr("fill", function(d, i) {return thisChart.colorScale(i);});
+			.attr("fill", (d, i)=>(thisChart.colorScale(i)));
 		
-		//Setting attributes
-		for (var attrName in colAttributes) {
-			this.colSelection.attr(attrName, colAttributes[attrName]);
-		}
-		
-		//Setting events
-		for (var eventName in onEvents) {
-			this.colSelection.on(eventName, onEvents[eventName]);
-		}
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this.colSelection, attributes, onEvents);
 	}
 	
 	/** 
@@ -151,6 +144,6 @@ class Histogram extends Chart {
 			.domain(sequence)
 			.range(newColors);
 		var thisChart = this;
-		if (this.colSelection != null) this.colSelection.attr("fill", function(d, i) {return thisChart.colorScale(i);});
+		if (this.colSelection != null) this.colSelection.attr("fill", (d, i)=>(thisChart.colorScale(i)));
 	}
 }

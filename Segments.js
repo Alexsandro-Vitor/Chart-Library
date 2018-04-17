@@ -73,6 +73,11 @@ class Segments extends Chart {
 		 */
 		this.segSelection = [];
 		/**
+		 * The dots of the chart
+		 * @member {Object} dotSelection
+		 */
+		this.dotSelection = [];
+		/**
 		 * The ranges of the chart
 		 * @member {Object} rangeSelection
 		 */
@@ -122,23 +127,16 @@ class Segments extends Chart {
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
-		Chart.addIfNull(attributes, "id", function(d, i) {return "seg" + i;});
+		Chart.addIfNull(attributes, "id", (d, i)=>("seg" + i));
 		attributes["class"] = "segment";
-		Chart.addIfNull(attributes, "d", function(d, i) {return thisChart.genSegPath(d);});
+		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genSegPath(d)));
 		Chart.addIfNull(attributes, "stroke", "black");
 		
 		this.segSelection = this.tag.selectAll(".segment").data(dataset).enter().append("path")
 			.attr("fill", "transparent");
 		
-		//Setting attributes
-		for (var attrName in attributes) {
-			this.segSelection.attr(attrName, attributes[attrName]);
-		}
-		
-		//Setting events
-		for (var eventName in onEvents) {
-			this.segSelection.on(eventName, onEvents[eventName]);
-		}
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this.segSelection, attributes, onEvents);
 	}
 	
 	/** 
@@ -152,11 +150,11 @@ class Segments extends Chart {
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
-		Chart.addIfNull(attributes, "id", function(d, i) {return "dotGroup" + i;});
-		attributes["class"] = function(d, i) {return "group" + data + "Dot";};
+		Chart.addIfNull(attributes, "id", (d, i)=>("dotGroup" + i));
+		attributes["class"] = "dotGroup";
 		Chart.addIfNull(attributes, "r", "5px");
-		Chart.addIfNull(attributes, "cx", function(d, i) {return thisChart.xScale(i);});
-		Chart.addIfNull(attributes, "cy", function(d, i) {return thisChart.yScale(d);});
+		Chart.addIfNull(attributes, "cx", (d, i)=>thisChart.xScale(i));
+		Chart.addIfNull(attributes, "cy", (d, i)=>thisChart.yScale(d));
 		
 		//Defining the dotColorScale domain
 		var sequence;
@@ -167,25 +165,15 @@ class Segments extends Chart {
 		//Creating the groups
 		this.dotSelection = this.tag.selectAll(".dotGroup").data(dataset).enter().append("g")
 			.attr("id", attributes["id"])
-			.attr("class", "dotGroup");
+			.attr("class", attributes["class"])
+			.attr("fill", (d, i)=>(thisChart.dotColorScale(i)))
+			.selectAll(".groupDot").data(d=>d).enter().append("circle");
 		
-		//Creating the dots
-		attributes["id"] = function(d, i) {return "dot" + thisChart.xAxisNames[i];};
-		var dotGroup;
-		for (var data in dataset) {
-			dotGroup = this.dotSelection.selectAll(".group" + data + "Dot").data(dataset[data]).enter().append("circle")
-				.attr("fill", function(d, i) {return thisChart.dotColorScale(data);});
-			
-			//Setting attributes
-			for (var attrName in attributes) {
-				dotGroup.attr(attrName, attributes[attrName]);
-			}
-			
-			//Setting events
-			for (var eventName in onEvents) {
-				dotGroup.on(eventName, onEvents[eventName]);
-			}
-		}
+		attributes["id"] = (d, i)=>("dot_" + thisChart.xAxisNames[i]);
+		attributes["class"] = "groupDot";
+		
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this.dotSelection, attributes, onEvents);
 	}
 	
 	/** 
@@ -199,12 +187,12 @@ class Segments extends Chart {
 	 */
 	setRanges(dataset, attributes, onEvents) {		
 		var thisChart = this;
-		if (attributes == null) attributes = [];
 		
 		//Mandatory attributes
-		Chart.addIfNull(attributes, "id", function(d, i) {return "range" + i;});
+		if (attributes == null) attributes = [];
+		Chart.addIfNull(attributes, "id", (d, i)=>("range" + i));
 		attributes["class"] = "range";
-		Chart.addIfNull(attributes, "d", function(d, i) {return thisChart.genRangePath(d[0], d[1]);});
+		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genRangePath(d[0], d[1])));
 		
 		//Defining the rangeColorScale domain
 		var sequence;
@@ -215,15 +203,8 @@ class Segments extends Chart {
 		this.rangeSelection = this.tag.selectAll(".range").data(dataset).enter().append("path")
 			.attr("fill", function(d, i) {return thisChart.rangeColorScale(i);});
 		
-		//Setting attributes
-		for (var attrName in attributes) {
-			this.rangeSelection.attr(attrName, attributes[attrName]);
-		}
-		
-		//Setting events
-		for (var eventName in onEvents) {
-			this.rangeSelection.on(eventName, onEvents[eventName]);
-		}
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this.rangeSelection, attributes, onEvents);
 	}
 	
 	/**

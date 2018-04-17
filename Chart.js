@@ -100,4 +100,22 @@
 	static addIfNull(array, field, value) {
 		if (array[field] == null) array[field] = value;
 	}
+	
+	/**
+	 * Sets attributes and events of a selection
+	 * @param {selection} selection - The selection of elements used
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the selected elements
+	 * @param {Object} onEvents - An object containing functions for events
+	 */
+	static insertAttributesEvents(selection, attributes, onEvents) {
+		//Setting attributes
+		for (var attrName in attributes) {
+			selection.attr(attrName, attributes[attrName]);
+		}
+		
+		//Setting events
+		for (var eventName in onEvents) {
+			selection.on(eventName, onEvents[eventName]);
+		}
+	}
 }
