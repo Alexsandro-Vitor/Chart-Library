@@ -88,14 +88,16 @@ class Segments extends Chart {
 		 * @member {Object} dotColorScale
 		 */
 		this.dotColorScale = d3.scaleLinear()
-			.range(["red", "blue"]);
+			.domain(Chart.genSequence(0, d3.schemeSet1.length, d3.schemeSet1.length - 1))
+			.range(d3.schemeSet1);
 		
 		/**
 		 * The color scale for ranges on the chart. Used to set the colors of each scale in the chart
 		 * @member {Object} rangeColorScale
 		 */
 		this.rangeColorScale = d3.scaleLinear()
-			.range(["yellow", "cyan"]);
+			.domain(Chart.genSequence(0, d3.schemeSet2.length, d3.schemeSet2.length - 1))
+			.range(d3.schemeSet2);
 	}
 	
 	/** 
@@ -156,17 +158,11 @@ class Segments extends Chart {
 		Chart.addIfNull(attributes, "cx", (d, i)=>thisChart.xScale(i));
 		Chart.addIfNull(attributes, "cy", (d, i)=>thisChart.yScale(d));
 		
-		//Defining the dotColorScale domain
-		var sequence;
-		if (dataset.length > 1) sequence = Chart.genSequence(0, this.dotColorScale.range().length, dataset.length - 1);
-		else sequence = Chart.genSequence(0, this.dotColorScale.range().length, 1);
-		this.dotColorScale.domain(sequence);
-		
 		//Creating the groups
 		this.dotSelection = this.tag.selectAll(".dotGroup").data(dataset).enter().append("g")
 			.attr("id", attributes["id"])
 			.attr("class", attributes["class"])
-			.attr("fill", (d, i)=>(thisChart.dotColorScale(i)))
+			.attr("fill", (d, i)=>(thisChart.dotColorScale(i % thisChart.dotColorScale.domain().length)))
 			.selectAll(".groupDot").data(d=>d).enter().append("circle");
 		
 		attributes["id"] = (d, i)=>("dot_" + thisChart.xAxisNames[i]);
@@ -194,14 +190,8 @@ class Segments extends Chart {
 		attributes["class"] = "range";
 		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genRangePath(d[0], d[1])));
 		
-		//Defining the rangeColorScale domain
-		var sequence;
-		if (dataset.length > 1) sequence = Chart.genSequence(0, this.rangeColorScale.range().length, dataset.length - 1);
-		else sequence = Chart.genSequence(0, this.rangeColorScale.range().length, 1);
-		this.rangeColorScale.domain(sequence);
-		
 		this.rangeSelection = this.tag.selectAll(".range").data(dataset).enter().append("path")
-			.attr("fill", function(d, i) {return thisChart.rangeColorScale(i);});
+			.attr("fill", (d, i)=>(thisChart.rangeColorScale(i % thisChart.rangeColorScale.domain().length)));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this.rangeSelection, attributes, onEvents);

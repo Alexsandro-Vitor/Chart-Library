@@ -81,7 +81,8 @@ class Histogram extends Chart {
 		 * @member {Object} colorScale
 		 */
 		this.colorScale = d3.scaleLinear()
-			.range(["red", "green"]);
+			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
+			.range(d3.schemeCategory10);
 	}
 	
 	/** 
@@ -128,7 +129,7 @@ class Histogram extends Chart {
 		
 		//Column selection and color setting
 		this.colSelection = this.tag.selectAll(".column").data(dataset).enter().append("rect")
-			.attr("fill", (d, i)=>(thisChart.colorScale(i)));
+			.attr("fill", (d, i)=>(thisChart.colorScale(i % thisChart.colorScale.domain().length)));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this.colSelection, attributes, onEvents);
@@ -139,11 +140,11 @@ class Histogram extends Chart {
 	 * @param {string[]} newColors - An array of colors for the colorScale to work with
 	 */
 	setColorScale(newColors) {
-		var sequence = Chart.genSequence(0, newColors.length, this.xAxisNames.length-1);
+		var sequence = Chart.genSequence(0, newColors.length, newColors.length-1);
 		this.colorScale
 			.domain(sequence)
 			.range(newColors);
 		var thisChart = this;
-		if (this.colSelection != null) this.colSelection.attr("fill", (d, i)=>(thisChart.colorScale(i)));
+		if (this.colSelection != null) this.colSelection.attr("fill", (d, i)=>(thisChart.colorScale(i % newColors.length)));
 	}
 }
