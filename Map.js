@@ -30,13 +30,13 @@ class Map extends Chart {
 		 * The Paths of the chart.
 		 * @member {Object} pathSelection
 		 */
-		this.pathSelection = [];
+		this.pathSelection = null;
 		
 		/**
 		 * The scale between input values and the value used at colorScheme. Its range should stay at [0, 1].
 		 * @member {Object} colorScale
 		 */
-		this.colorScale = d3.scaleLinear();
+		this.colorScale = d3.scalePow();
 		
 		/**
 		 * The color scheme used at the chart. Uses d3.interpolateInferno by default.
@@ -45,7 +45,7 @@ class Map extends Chart {
 		this.colorScheme = d3.interpolateInferno;
 		
 		/**
-		 * The function which selects the color of each path. By default, it uses the fillValue normalized by the colorScale to select a value at the colorScheme.
+		 * The function which selects the color of the plots. By default, it uses the fillValue normalized by the colorScale to select a value at the colorScheme.
 		 * @member {Object} fillFunction
 		 */
 		this.fillFunction = (d, i)=>this.colorScheme(this.colorScale(this.fillValue(d, i)));
@@ -55,6 +55,8 @@ class Map extends Chart {
 		 * @member {Object} fillValue
 		 */
 		this.fillValue = (d, i)=>1;
+		
+		this.dotSelection = null;
 	}
 	
 	/** 
@@ -95,6 +97,48 @@ class Map extends Chart {
 			.attr("fill", (d, i)=>thisChart.fillFunction(d, i));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.pathSelection, null, onEvents);
+		Chart.insertAttributesEvents(this.pathSelection, attributes, onEvents);
+	}
+	
+	/** 
+	 * Plots data as dots on the map chart.
+	 * @param {number[][]} dataset - The data to be plotted on the map.
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the map
+	 * @param {Object} onEvents - An object containing functions for events
+	 */
+	setDots(dataset, attributes, onEvents) {
+		var thisChart = this;
+		
+		//Mandatory attributes
+		if (attributes == null) attributes = [];
+		Chart.addIfNull(attributes, "id", (d, i)=>("dot" + i));
+		attributes["class"] = "mapDot";
+		Chart.addIfNull(attributes, "r", "3px");
+		Chart.addIfNull(attributes, "cx", 10);
+		Chart.addIfNull(attributes, "cy", 10);
+		
+		this.dotSelection = this.tag.selectAll(".mapDot").data(dataset).enter().append("circle")
+			.attr("fill", (d, i)=>thisChart.fillFunction(d, i));
+		
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this.dotSelection, attributes, onEvents);
+	}
+	
+	/** 
+	 * Clears the chart, removing all paths and dots.
+	 */
+	clear() {
+		if (this.pathSelection) {
+			this.pathSelection.remove();
+			this.pathSelection = null;
+		}
+		if (this.dotSelection) {
+			this.dotSelection.remove();
+			this.dotSelection = null;
+		}
+		if (this.labels) {
+			this.labels.tag.remove();
+			this.labels = null;
+		}
 	}
 }
