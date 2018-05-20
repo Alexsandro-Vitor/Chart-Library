@@ -1,69 +1,87 @@
+/**
+ * Class that represents a Map chart.
+ * @extends Chart
+ */
 class Map extends Chart {
 	/**
 	 * @constructor
-	 * @param {Object} container - The tag in which the chart will be inserted
-	 * @param {string} id - The id of the chart tag
-	 * @param {(Object|number)} margins - The margins of the chart. If a number is passed, all its values will be the same
-	 * @param {number} margins.left - Left margin of the chart
-	 * @param {number} margins.right - Right margin of the chart
-	 * @param {number} margins.top - Upper margin of the chart
-	 * @param {number} margins.bottom - Lower margin of the chart
-	 * @param {number} totalWidth - The width of the chart, counting the margins
-	 * @param {number} totalHeight - The height of the chart, counting the margins 
+	 * @param {d3.selection} container - The tag in which the chart will be inserted.
+	 * @param {string} id - The id of the chart tag.
+	 * @param {Object} position - The position of the chart.
+	 * @param {number} position.x - The X coordinate of the chart.
+	 * @param {number} position.y - The Y coordinate of the chart.
+	 * @param {(number|Object)} margins - The margins of the chart. If a number is passed, all its values will be the same.
+	 * @param {number} margins.left - Left margin of the chart.
+	 * @param {number} margins.right - Right margin of the chart.
+	 * @param {number} margins.top - Upper margin of the chart.
+	 * @param {number} margins.bottom - Lower margin of the chart.
+	 * @param {Object} dimensions - The dimensions of the chart.
+	 * @param {number} dimensions.width - The width of the chart, counting the margins.
+	 * @param {number} dimensions.height - The height of the chart, counting the margins.
 	 */
-	constructor(container, id, margins, totalWidth, totalHeight) {
-		super(container, id, margins, totalWidth, totalHeight, "mapChart");
+	constructor(container, id, position, margins, dimensions) {
+		super(container, id, position, margins, dimensions, "mapChart");
 		
 		/**
-		 * The projection of the chart. Uses geoMercator by default.
-		 * @member {Object} projection
+		 * The projection of the chart.
+		 * @member {d3.projection} Map#projection
+		 * @default d3.geoMercator()
 		 */
 		this.projection = d3.geoMercator();
 		
 		/**
 		 * The geoPath of the chart.
-		 * @member {Object} geoPath
+		 * @member {d3.path} Map#geoPath
+		 * @default d3.geoPath().projection(this.projection)
 		 */
 		this.geoPath = d3.geoPath().projection(this.projection);
 		
 		/**
 		 * The Paths of the chart.
-		 * @member {Object} pathSelection
+		 * @member {d3.selection} Map#pathSelection
 		 */
 		this.pathSelection = null;
 		
 		/**
 		 * The scale between input values and the value used at colorScheme. Its range should stay at [0, 1].
-		 * @member {Object} colorScale
+		 * @member {d3.scale} Map#colorScale
+		 * @default d3.scalePow()
 		 */
 		this.colorScale = d3.scalePow();
 		
 		/**
 		 * The color scheme used at the chart. Uses d3.interpolateInferno by default.
-		 * @member {Object} colorScheme
+		 * @member {d3.scale} Map#colorScheme
+		 * @default d3.interpolateInferno
 		 */
 		this.colorScheme = d3.interpolateInferno;
 		
 		/**
 		 * The function which selects the color of the plots. By default, it uses the fillValue normalized by the colorScale to select a value at the colorScheme.
-		 * @member {Object} fillFunction
+		 * @member {function} Map#fillFunction
+		 * @default (d, i)=>this.colorScheme(this.colorScale(this.fillValue(d, i)))
 		 */
 		this.fillFunction = (d, i)=>this.colorScheme(this.colorScale(this.fillValue(d, i)));
 		
 		/**
 		 * The function which determines the value of the dataset which will be used on the fillFunction. Default function always returns 1.
-		 * @member {Object} fillValue
+		 * @member {function} Map#fillValue
+		 * @default (d, i)=>1
 		 */
 		this.fillValue = (d, i)=>1;
 		
+		/**
+		 * The dots plotted in the chart.
+		 * @member {d3.selection} Map#dotSelection
+		 */
 		this.dotSelection = null;
 	}
 	
 	/** 
 	 * Plots the geojson on the chart as paths.
-	 * @param {Object} geojson - The data of a geojson file
-	 * @param {Object} attributes - An object containing functions or constants for attributes of the map
-	 * @param {Object} onEvents - An object containing functions for events
+	 * @param {Object} geojson - The data of a geojson file.
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the map.
+	 * @param {Object} onEvents - An object containing functions for events.
 	 */
 	setMap(geojson, attributes, onEvents) {
 		var thisChart = this;
@@ -87,8 +105,8 @@ class Map extends Chart {
 	/** 
 	 * Plots the dataset on the map chart.
 	 * @param {number[][]} dataset - The data to be plotted on the map.
-	 * @param {Object} attributes - An object containing functions or constants for attributes of the map
-	 * @param {Object} onEvents - An object containing functions for events
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the map.
+	 * @param {Object} onEvents - An object containing functions for events.
 	 */
 	setData(dataset, attributes, onEvents) {
 		var thisChart = this;
@@ -103,8 +121,8 @@ class Map extends Chart {
 	/** 
 	 * Plots data as dots on the map chart.
 	 * @param {number[][]} dataset - The data to be plotted on the map.
-	 * @param {Object} attributes - An object containing functions or constants for attributes of the map
-	 * @param {Object} onEvents - An object containing functions for events
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the map.
+	 * @param {Object} onEvents - An object containing functions for events.
 	 */
 	setDots(dataset, attributes, onEvents) {
 		var thisChart = this;
