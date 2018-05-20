@@ -1,64 +1,52 @@
-/**
- * Class that represents a Scatterplot.
- * @extends Chart
- */
 class Scatterplot extends Chart {
 	/**
 	 * @constructor
-	 * @param {d3.selection} container - The tag in which the chart will be inserted.
-	 * @param {string} id - The id of the chart tag.
-	 * @param {Object} position - The position of the chart.
-	 * @param {number} position.x - The X coordinate of the chart.
-	 * @param {number} position.y - The Y coordinate of the chart.
-	 * @param {(number|Object)} margins - The margins of the chart. If a number is passed, all its values will be the same.
-	 * @param {number} margins.left - Left margin of the chart.
-	 * @param {number} margins.right - Right margin of the chart.
-	 * @param {number} margins.top - Upper margin of the chart.
-	 * @param {number} margins.bottom - Lower margin of the chart.
-	 * @param {Object} dimensions - The dimensions of the chart.
-	 * @param {number} dimensions.width - The width of the chart, counting the margins.
-	 * @param {number} dimensions.height - The height of the chart, counting the margins.
+	 * @param {Object} container - The tag in which the chart will be inserted
+	 * @param {string} id - The id of the chart tag
+	 * @param {(Object|number)} margins - The margins of the chart. If a number is passed, all its values will be the same
+	 * @param {number} margins.left - Left margin of the chart
+	 * @param {number} margins.right - Right margin of the chart
+	 * @param {number} margins.top - Upper margin of the chart
+	 * @param {number} margins.bottom - Lower margin of the chart
+	 * @param {number} totalWidth - The width of the chart, counting the margins
+	 * @param {number} totalHeight - The height of the chart, counting the margins 
 	 */
-	constructor(container, id, position, margins, dimensions) {
-		super(container, id, position, margins, dimensions, "scatteplotChart");
+	constructor(container, id, margins, totalWidth, totalHeight) {
+		super(container, id, margins, totalWidth, totalHeight, "scatteplotChart");
 		
 		/**
 		 * The X scale of the chart.
-		 * @member {d3.scale} Scatterplot#xScale
-		 * @default d3.scaleLinear().range([0, this.width])
+		 * @member {Object} xScale
 		 */
 		this.xScale = d3.scaleLinear()
 			.range([0, this.width]);
 		/**
 		 * The Y scale of the chart.
-		 * @member {d3.scale} Scatterplot#yScale
-		 * @default d3.scaleLinear().range([this.height, 0])
+		 * @member {Object} yScale
 		 */
 		this.yScale = d3.scaleLinear()
 			.range([this.height, 0]);
 		/**
-		 * The top X axis of the chart.
-		 * @member {d3.axis} Scatterplot#xAxisTop
-		 * @default d3.axisTop(this.xScale)
+		 * The top X axis of the chart
+		 * @member {Object} xAxisTop
 		 */
 		this.xAxisTop = d3.axisTop(this.xScale);
 		/**
-		 * The bottom X axis of the chart.
-		 * @member {d3.axis} Scatterplot#xAxisBottom
-		 * @default d3.axisBottom(this.xScale
+		 * The bottom X axis of the chart
+		 * @member {Object} xAxisBottom
 		 */
 		this.xAxisBottom = d3.axisBottom(this.xScale);
 		/**
-		 * The group of the top X axis.
-		 * @member {d3.selection} Scatterplot#xAxisTopGroup
+		 * The group of the top X axis
+		 * @member {Object} xAxisTopGroup
 		 */
 		this.xAxisTopGroup = this.tag
 			.append("g")
 			.attr("class", "xAxis");
 		this.xAxisTopGroup.call(this.xAxisTop);
 		/**
-		 * The group of the bottom X axis.
-		 * @member {d3.selection} Scatterplot#xAxisBottomGroup
+		 * The group of the bottom X axis
+		 * @member {Object} xAxisBottomGroup
 		 */
 		this.xAxisBottomGroup = this.tag
 			.append("g")
@@ -66,28 +54,26 @@ class Scatterplot extends Chart {
 			.attr("transform", "translate(0, " + this.height + ")");
 		this.xAxisBottomGroup.call(this.xAxisBottom);
 		/**
-		 * The left Y axis of the chart.
-		 * @member {d3.axis} Scatterplot#yAxisLeft
-		 * @default d3.axisLeft(this.yScale)
+		 * The left Y axis of the chart
+		 * @member {Object} yAxisLeft
 		 */
 		this.yAxisLeft = d3.axisLeft(this.yScale);
 		/**
-		 * The right Y axis of the chart.
-		 * @member {d3.axis} Scatterplot#yAxisRight
-		 * @default d3.axisRight(this.yScale)
+		 * The right Y axis of the chart
+		 * @member {Object} yAxisRight
 		 */
 		this.yAxisRight = d3.axisRight(this.yScale);
 		/**
-		 * The group of the left Y axis.
-		 * @member {d3.selection} Scatterplot#yAxisLeftGroup
+		 * The group of the left Y axis
+		 * @member {Object} yAxisLeftGroup
 		 */
 		this.yAxisLeftGroup = this.tag
 			.append("g")
 			.attr("class", "yAxis")
 		this.yAxisLeftGroup.call(this.yAxisLeft);
 		/**
-		 * The group of the right Y axis.
-		 * @member {d3.selection} Scatterplot#yAxisRightGroup
+		 * The group of the right Y axis
+		 * @member {Object} yAxisRightGroup
 		 */
 		this.yAxisRightGroup = this.tag
 			.append("g")
@@ -95,14 +81,13 @@ class Scatterplot extends Chart {
 			.attr("transform", "translate(" + this.width + ", 0)");
 		this.yAxisRightGroup.call(this.yAxisRight);
 		/**
-		 * The dots of the scatterplot.
-		 * @member {d3.selection} Scatterplot#dotSelection
+		 * The dots of the scatterplot
+		 * @member {Object} dotSelection
 		 */
 		this.dotSelection = null;
 		/**
 		 * The color scale of the scatterplot. Used to set the colors of each dot.
-		 * @member {d3.scale} Scatterplot#colorScale
-		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1)).range(d3.schemeCategory10)
+		 * @member {Object} colorScale
 		 */
 		this.colorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
@@ -110,10 +95,10 @@ class Scatterplot extends Chart {
 	}
 	
 	/** 
-	 * Inserts data on the scatterplot and plots it.
-	 * @param {number[]} dataset - An array of values for the dots.
-	 * @param {Object} attributes - An object containing functions or constants for attributes of the dots.
-	 * @param {Object} onEvents - An object containing functions for events.
+	 * Inserts data on the scatterplot and plots it
+	 * @param {number[]} dataset - An array of values for the dots
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the dots
+	 * @param {Object} onEvents - An object containing functions for events
 	 */
 	setData(dataset, attributes, onEvents) {
 		var thisChart = this;

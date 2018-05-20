@@ -1,50 +1,39 @@
-/**
- * Class that represents a Segment chart.
- * @extends Chart
- */
 class Segments extends Chart {
 	/**
 	 * @constructor
-	 * @param {d3.selection} container - The tag in which the chart will be inserted.
-	 * @param {string} id - The id of the chart tag.
-	 * @param {Object} position - The position of the chart.
-	 * @param {number} position.x - The X coordinate of the chart.
-	 * @param {number} position.y - The Y coordinate of the chart.
-	 * @param {(number|Object)} margins - The margins of the chart. If a number is passed, all its values will be the same.
-	 * @param {number} margins.left - Left margin of the chart.
-	 * @param {number} margins.right - Right margin of the chart.
-	 * @param {number} margins.top - Upper margin of the chart.
-	 * @param {number} margins.bottom - Lower margin of the chart.
-	 * @param {Object} dimensions - The dimensions of the chart.
-	 * @param {number} dimensions.width - The width of the chart, counting the margins.
-	 * @param {number} dimensions.height - The height of the chart, counting the margins.
+	 * @param {Object} container - The tag in which the chart will be inserted
+	 * @param {string} id - The id of the chart tag
+	 * @param {(Object|number)} margins - The margins of the chart. If a number is passed, all its values will be the same
+	 * @param {number} margins.left - Left margin of the chart
+	 * @param {number} margins.right - Right margin of the chart
+	 * @param {number} margins.top - Upper margin of the chart
+	 * @param {number} margins.bottom - Lower margin of the chart
+	 * @param {number} totalWidth - The width of the chart, counting the margins
+	 * @param {number} totalHeight - The height of the chart, counting the margins 
 	 */
-	constructor(container, id, position, margins, dimensions) {
-		super(container, id, position, margins, dimensions, "segmentsChart");
+	constructor(container, id, margins, totalWidth, totalHeight) {
+		super(container, id, margins, totalWidth, totalHeight, "segmentsChart");
 		
 		/**
-		 * The X scale of the chart. Used by the segments.
-		 * @member {d3.scale} Segments#xScale
-		 * @default d3.scaleLinear()
+		 * The X scale of the chart. Used by the columns
+		 * @member {Object} xScale
 		 */
 		this.xScale = d3.scaleLinear();
 		
 		/**
-		 * The X scale of the chart. Used by the axis.
-		 * @member {d3.scale} Segments#xAxisScale
-		 * @default d3.scaleOrdinal().range([0, this.width])
+		 * The X scale of the chart. Used by the axis
+		 * @member {Object} xAxisScale
 		 */
 		this.xAxisScale = d3.scaleOrdinal()
 			.range([0, this.width]);
 		/**
-		 * The X axis of the chart.
-		 * @member {d3.axis} Segments#xAxis
-		 * @default d3.axisBottom(this.xAxisScale)
+		 * The X axis of the chart
+		 * @member {Object} xAxis
 		 */
 		this.xAxis = d3.axisBottom(this.xAxisScale);
 		/**
-		 * The group of the X axis.
-		 * @member {d3.selection} Segments#xAxisGroup
+		 * The group of the X axis
+		 * @member {Object} xAxisGroup
 		 */
 		this.xAxisGroup = this.tag
 			.append("g")
@@ -53,21 +42,19 @@ class Segments extends Chart {
 		this.xAxisGroup.call(this.xAxis);
 		
 		/**
-		 * The Y scale of the chart. Used by the axis and the columns.
-		 * @member {d3.scale} Segments#yScale
-		 * @default d3.scaleLinear().range([this.height, 0])
+		 * The Y scale of the chart. Used by the axis and the columns
+		 * @member {Object} yScale
 		 */
 		this.yScale = d3.scaleLinear()
 			.range([this.height, 0]);
 		/**
-		 * The Y axis of the chart.
-		 * @member {d3.axis} Segments#yAxis
-		 * @default d3.axisLeft(this.yScale)
+		 * The Y axis of the chart
+		 * @member {Object} yAxis
 		 */
 		this.yAxis = d3.axisLeft(this.yScale);
 		/**
-		 * The group of the Y axis.
-		 * @member {d3.selection} Segments#yAxisGroup
+		 * The group of the Y axis
+		 * @member {Object} yAxisGroup
 		 */
 		this.yAxisGroup = this.tag
 			.append("g")
@@ -75,40 +62,38 @@ class Segments extends Chart {
 		this.yAxisGroup.call(this.yAxis);
 		
 		/**
-		 * The names in the X axis.
-		 * @member {string[]} Segments#xAxisNames
+		 * The names in the X axis
+		 * @member {string[]} xAxisNames
 		 */
 		this.xAxisNames = [];
 		
 		/**
-		 * The segments of the chart.
-		 * @member {d3.selection} Segments#segSelection
+		 * The segments of the chart
+		 * @member {Object} segSelection
 		 */
 		this.segSelection = [];
 		/**
-		 * The dots of the chart.
-		 * @member {d3.selection} Segments#dotSelection
+		 * The dots of the chart
+		 * @member {Object} dotSelection
 		 */
 		this.dotSelection = [];
 		/**
-		 * The ranges of the chart.
-		 * @member {d3.selection} Segments#rangeSelection
+		 * The ranges of the chart
+		 * @member {Object} rangeSelection
 		 */
 		this.rangeSelection = [];
 		
 		/**
-		 * The color scale for dots on the chart. Used to set the colors of each dotGroup in the chart.
-		 * @member {d3.scale} Segments#dotColorScale
-		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeSet1.length, d3.schemeSet1.length - 1)).range(d3.schemeSet1)
+		 * The color scale for dots on the chart. Used to set the colors of each dotGroup in the chart
+		 * @member {Object} dotColorScale
 		 */
 		this.dotColorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeSet1.length, d3.schemeSet1.length - 1))
 			.range(d3.schemeSet1);
 		
 		/**
-		 * The color scale for ranges on the chart. Used to set the colors of each scale in the chart.
-		 * @member {d3.scale} Segments#rangeColorScale
-		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeSet2.length, d3.schemeSet2.length - 1)).range(d3.schemeSet2)
+		 * The color scale for ranges on the chart. Used to set the colors of each scale in the chart
+		 * @member {Object} rangeColorScale
 		 */
 		this.rangeColorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeSet2.length, d3.schemeSet2.length - 1))
@@ -116,8 +101,8 @@ class Segments extends Chart {
 	}
 	
 	/** 
-	 * Sets the names the X axis.
-	 * @param {string[]} newDomain - An array of names for the X axis.
+	 * Sets the names the X axis
+	 * @param {string[]} newDomain - An array of names for the X axis
 	 */
 	setXDomain(newDomain) {
 		this.xAxisNames = newDomain.slice();
@@ -134,10 +119,10 @@ class Segments extends Chart {
 	}
 	
 	/** 
-	 * Inserts data on the chart as segments and plots it.
-	 * @param {number[][]} dataset - An array of arrays for each segment.
-	 * @param {Object} attributes - An object containing functions or constants for attributes of the segments.
-	 * @param {Object} onEvents - An object containing functions for events.
+	 * Inserts data on the chart as segments and plots it
+	 * @param {number[][]} dataset - An array of arrays for each segment
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the segments
+	 * @param {Object} onEvents - An object containing functions for events
 	 */
 	setSegments(dataset, attributes, onEvents) {
 		var thisChart = this;
@@ -157,10 +142,10 @@ class Segments extends Chart {
 	}
 	
 	/** 
-	 * Inserts data on the chart as dots and plots it.
-	 * @param {number[][]} dataset - An array of arrays for each dot.
-	 * @param {Object} attributes - An object containing functions or constants for attributes of the dots.
-	 * @param {Object} onEvents - An object containing functions for events.
+	 * Inserts data on the chart as dots and plots it
+	 * @param {number[][]} dataset - An array of arrays for each dot
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the dots
+	 * @param {Object} onEvents - An object containing functions for events
 	 */
 	setDots(dataset, attributes, onEvents) {
 		var thisChart = this;
@@ -188,13 +173,13 @@ class Segments extends Chart {
 	}
 	
 	/** 
-	 * Inserts data on the chart as ranges and plots it.
-	 * @param {number[][][]} dataset - An array of arrays for each range.
-	 * @param {number[][]} dataset[i] - The data used to create one range.
-	 * @param {number[]} dataset[i][0] - The array with the minimum values of the range.
-	 * @param {number[]} dataset[i][1] - The array with the maximum values of the range.
-	 * @param {Object} attributes - An object containing functions or constants for attributes of the ranges.
-	 * @param {Object} onEvents - An object containing functions for events.
+	 * Inserts data on the chart as ranges and plots it
+	 * @param {number[][][]} dataset - An array of arrays for each range
+	 * @param {number[][]} dataset[i] - The data used to create one range
+	 * @param {number[]} dataset[i][0] - The array with the minimum values of the range
+	 * @param {number[]} dataset[i][1] - The array with the maximum values of the range
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the ranges
+	 * @param {Object} onEvents - An object containing functions for events
 	 */
 	setRanges(dataset, attributes, onEvents) {		
 		var thisChart = this;
@@ -213,9 +198,9 @@ class Segments extends Chart {
 	}
 	
 	/**
-	 * Generates a path for a segment.
-	 * @param {number[]} d - The array with the values of the path.
-	 * @returns {string} A value for the "d" field of the path.
+	 * Generates a path for a segment
+	 * @param {number[]} d - The array with the values of the path
+	 * @returns {string} A value for the "d" field of the path
 	 */
 	genSegPath(d) {
 		var path = d3.path();
@@ -227,10 +212,10 @@ class Segments extends Chart {
 	}
 	
 	/**
-	 * Generates a path for a range.
-	 * @param {number[]} minValues - The array with the minimum values of the range.
-	 * @param {number[]} maxValues - The array with the maximum values of the range.
-	 * @returns {string} A value for the "d" field of the path.
+	 * Generates a path for a range
+	 * @param {number[]} minValues - The array with the minimum values of the range
+	 * @param {number[]} maxValues - The array with the maximum values of the range
+	 * @returns {string} A value for the "d" field of the path
 	 */
 	genRangePath(minValues, maxValues) {
 		var path = d3.path();
@@ -246,16 +231,16 @@ class Segments extends Chart {
 	}
 	
 	/** 
-	 * Sets the new colors of the dotGroups. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function.
-	 * @param {string[]} newColors - An array of colors for the dotColorScale to work with.
+	 * Sets the new colors of the dotGroups. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function
+	 * @param {string[]} newColors - An array of colors for the dotColorScale to work with
 	 */
 	setDotColorScale(newColors) {
 		this.dotColorScale.range(newColors);
 	}
 	
 	/** 
-	 * Sets the new colors of the chart. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function.
-	 * @param {string[]} newColors - An array of colors for the rangeColorScale to work with.
+	 * Sets the new colors of the chart. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function
+	 * @param {string[]} newColors - An array of colors for the rangeColorScale to work with
 	 */
 	setRangeColorScale(newColors) {
 		this.rangeColorScale.range(newColors);
