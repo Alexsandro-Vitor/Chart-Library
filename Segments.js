@@ -97,6 +97,25 @@ class Segments extends Chart {
 		this.rangeSelection = [];
 		
 		/**
+		 * A path generator for the segments.
+		 * @member {d3.line} Segments#segPathGenerator
+		 * @default d3.line().x((d, i)=>this.xScale(i)).y((d, i)=>this.yScale(d));
+		 */
+		this.segPathGenerator = d3.line()
+			.x((d, i)=>this.xScale(i))
+			.y((d, i)=>this.yScale(d));
+		
+		/**
+		 * A path generator for the range.
+		 * @member {d3.area} Segments#rangePathGenerator
+		 * @default d3.area().x((d, i)=>this.xScale(i)).y0((d, i)=>this.yScale(d[0])).y1((d, i)=>this.yScale(d[1]));
+		 */
+		this.rangePathGenerator = d3.area()
+			.x((d, i)=>this.xScale(i))
+			.y0((d, i)=>this.yScale(d[0]))
+			.y1((d, i)=>this.yScale(d[1]));
+		
+		/**
 		 * The color scale for dots on the chart. Used to set the colors of each dotGroup in the chart.
 		 * @member {d3.scale} Segments#dotColorScale
 		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeSet1.length, d3.schemeSet1.length - 1)).range(d3.schemeSet1)
@@ -146,7 +165,7 @@ class Segments extends Chart {
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("seg" + i));
 		attributes["class"] = "segment";
-		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genSegPath(d)));
+		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.segPathGenerator(d)));
 		Chart.addIfNull(attributes, "stroke", "black");
 		
 		this.segSelection = this.tag.selectAll(".segment").data(dataset).enter().append("path")
@@ -191,8 +210,7 @@ class Segments extends Chart {
 	 * Inserts data on the chart as ranges and plots it.
 	 * @param {number[][][]} dataset - An array of arrays for each range.
 	 * @param {number[][]} dataset[i] - The data used to create one range.
-	 * @param {number[]} dataset[i][0] - The array with the minimum values of the range.
-	 * @param {number[]} dataset[i][1] - The array with the maximum values of the range.
+	 * @param {number[]} dataset[i][a] - Array with the minimum and maximum values (respectively) at index 'a'.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the ranges.
 	 * @param {Object} onEvents - An object containing functions for events.
 	 */
@@ -203,46 +221,13 @@ class Segments extends Chart {
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("range" + i));
 		attributes["class"] = "range";
-		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genRangePath(d[0], d[1])));
+		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.rangePathGenerator(d)));
 		
 		this.rangeSelection = this.tag.selectAll(".range").data(dataset).enter().append("path")
 			.attr("fill", (d, i)=>(thisChart.rangeColorScale(i % thisChart.rangeColorScale.domain().length)));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this.rangeSelection, attributes, onEvents);
-	}
-	
-	/**
-	 * Generates a path for a segment.
-	 * @param {number[]} d - The array with the values of the path.
-	 * @returns {string} A value for the "d" field of the path.
-	 */
-	genSegPath(d) {
-		var path = d3.path();
-		path.moveTo(this.xScale(0), this.yScale(d[0]));
-		for (var i = 1; i < d.length; i++) {
-			path.lineTo(this.xScale(i), this.yScale(d[i]));
-		}
-		return path.toString();
-	}
-	
-	/**
-	 * Generates a path for a range.
-	 * @param {number[]} minValues - The array with the minimum values of the range.
-	 * @param {number[]} maxValues - The array with the maximum values of the range.
-	 * @returns {string} A value for the "d" field of the path.
-	 */
-	genRangePath(minValues, maxValues) {
-		var path = d3.path();
-		path.moveTo(this.xScale(0), this.yScale(minValues[0]));
-		for (var i = 1; i < minValues.length; i++) {
-			path.lineTo(this.xScale(i), this.yScale(minValues[i]));
-		}
-		for (var i = maxValues.length-1; i >= 0; i--) {
-			path.lineTo(this.xScale(i), this.yScale(maxValues[i]));
-		}
-		path.closePath();
-		return path.toString();
 	}
 	
 	/** 
