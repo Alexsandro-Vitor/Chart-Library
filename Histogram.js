@@ -20,7 +20,7 @@ class Histogram extends Chart {
 	 * @param {number} dimensions.height - The height of the chart, counting the margins.
 	 */
 	constructor(container, id, position, margins, dimensions) {
-		super(container, id, position, margins, dimensions, "histogram");
+		super(container, id, position, margins, dimensions, "histogramChart");
 		
 		/**
 		 * The X scale of the histogram. Used by the columns.

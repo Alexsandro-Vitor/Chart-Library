@@ -132,7 +132,7 @@ class Scatterplot extends Chart {
 		Chart.addIfNull(attributes, "cy", (d, i)=>(thisChart.yScale(d[1])));
 		Chart.addIfNull(attributes, "r", "4px");
 		
-		//Column selection and color setting
+		//Dot selection and color setting
 		this.dotSelection = this.tag.selectAll(".dot").data(dataset).enter().append("circle")
 			.attr("fill", (d, i)=>(thisChart.colorScale(i % thisChart.colorScale.domain().length)));
 		
