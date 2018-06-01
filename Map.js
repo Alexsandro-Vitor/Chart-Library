@@ -22,59 +22,110 @@ class Map extends Chart {
 	constructor(container, id, position, margins, dimensions) {
 		super(container, id, position, margins, dimensions, "mapChart");
 		
-		/**
-		 * The projection of the chart.
-		 * @member {d3.projection} Map#projection
-		 * @default d3.geoMercator()
-		 */
-		this.projection = d3.geoMercator();
+		this._projection = d3.geoMercator();
+		this._geoPath = d3.geoPath().projection(this._projection);
 		
-		/**
-		 * The geoPath of the chart.
-		 * @member {d3.path} Map#geoPath
-		 * @default d3.geoPath().projection(this.projection)
-		 */
-		this.geoPath = d3.geoPath().projection(this.projection);
+		this._fillValue = (d, i)=>1;
 		
-		/**
-		 * The Paths of the chart.
-		 * @member {d3.selection} Map#pathSelection
-		 */
-		this.pathSelection = null;
+		this._colorScale = d3.scalePow();
 		
-		/**
-		 * The scale between input values and the value used at colorScheme. Its range should stay at [0, 1].
-		 * @member {d3.scale} Map#colorScale
-		 * @default d3.scalePow()
-		 */
-		this.colorScale = d3.scalePow();
+		this._colorScheme = d3.interpolateInferno;
 		
-		/**
-		 * The color scheme used at the chart. Uses d3.interpolateInferno by default.
-		 * @member {d3.scale} Map#colorScheme
-		 * @default d3.interpolateInferno
-		 */
-		this.colorScheme = d3.interpolateInferno;
+		this._fillFunction = (d, i)=>this._colorScheme(this._colorScale(this._fillValue(d, i)));
 		
-		/**
-		 * The function which selects the color of the plots. By default, it uses the fillValue normalized by the colorScale to select a value at the colorScheme.
-		 * @member {function} Map#fillFunction
-		 * @default (d, i)=>this.colorScheme(this.colorScale(this.fillValue(d, i)))
-		 */
-		this.fillFunction = (d, i)=>this.colorScheme(this.colorScale(this.fillValue(d, i)));
+		this._pathSelection = null;
 		
-		/**
-		 * The function which determines the value of the dataset which will be used on the fillFunction. Default function always returns 1.
-		 * @member {function} Map#fillValue
-		 * @default (d, i)=>1
-		 */
-		this.fillValue = (d, i)=>1;
-		
-		/**
-		 * The dots plotted in the chart.
-		 * @member {d3.selection} Map#dotSelection
-		 */
-		this.dotSelection = null;
+		this._dotSelection = null;
+	}
+	
+	/**
+	 * Returns the selection of the paths of the chart.
+	 * @returns {d3.selection} The paths of this chart.
+	 */
+	pathSelection() {
+		return this._pathSelection;
+	}
+	
+	/**
+	 * Returns the selection of the dots of the chart.
+	 * @returns {d3.selection} The dots of this chart.
+	 */
+	dotSelection() {
+		return this._dotSelection;
+	}
+	
+	/**
+	 * If a projection is given, sets the projection of the map, otherwise returns the current projection.
+	 * @param {Object} projection - The new projection of the map.
+	 * @returns {(Map|d3.projection)} This object or the current projection.
+	 */
+	projection(projection) {
+		if (projection) {
+			this._projection = projection;
+			this._geoPath = d3.geoPath().projection(this._projection);
+			return this;
+		} else {
+			return this._projection;
+		}
+	}
+	
+	/**
+	 * The function which determines the value of the dataset to be used on the fillFunction. Default function always returns 1. If a function is given, sets fillValue, otherwise returns the current fillValue.
+	 * @param {function} func - The new fillValue.
+	 * @returns {(Map|function)} This object or the current fillValue.
+	 */
+	fillValue(func) {
+		if (func) {
+			this._fillValue = func;
+			return this;
+		} else {
+			return this._fillValue;
+		}
+	}
+	
+	/**
+	 * The scale between input values and the value used at colorScheme. Its range should stay at [0, 1]. If a scale is given sets the colorScale, otherwise returns the current projection.
+	 * @param {d3.scale} scale - The new colorScale.
+	 * @returns {(Map|d3.projection)} This object or the current colorScale.
+	 */
+	colorScale(scale) {
+		if (scale) {
+			this._colorScale = scale;
+			return this;
+		} else {
+			return this._colorScale;
+		}
+	}
+	
+	/**
+	 * The color scheme used at the chart. Uses d3.interpolateInferno by default. If a scale is given sets the colorScheme, otherwise returns the current colorScheme.
+	 * @param {d3.scale} scheme - The new colorScheme.
+	 * @returns {(Map|d3.scale)} This object or the current colorScheme.
+	 */
+	colorScheme(scheme) {
+		if (scheme) {
+			this._colorScheme = scheme;
+			return this;
+		} else {
+			return this._colorScheme;
+		}
+	}
+	
+	/**
+	 * The function which sets the colors of the map. If a function is given, sets fillFunction. Setting func to null will reset fillFunction to its default value: (d, i)=>this._colorScheme(this._colorScale(this._fillValue(d, i))). Not passing a value makes it return the current fillFunction.
+	 * @param {function} func - The new fillFunction.
+	 * @returns {(Map|function)} This object or the current fillFunction.
+	 */
+	fillFunction(func) {
+		if (func) {
+			this._fillFunction = func;
+			return this;
+		} else if (func === null) {
+			this._fillFunction = (d, i)=>this._colorScheme(this._colorScale(this._fillValue(d, i)));
+			return this;
+		} else {
+			return this._fillFunction;
+		}
 	}
 	
 	/** 
@@ -87,19 +138,19 @@ class Map extends Chart {
 		var thisChart = this;
 		
 		//Scales the projection to centralize the map
-		this.projection.fitExtent([[0, 0], [this.width, this.height]], geojson);
+		this._projection.fitExtent([[0, 0], [this._width, this._height]], geojson);
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>d.properties.L1);
 		attributes["class"] = "mapPath";
-		Chart.addIfNull(attributes, "d", (d, i)=>thisChart.geoPath(d.geometry));
+		Chart.addIfNull(attributes, "d", (d, i)=>thisChart._geoPath(d.geometry));
 		
-		this.pathSelection = this.tag.selectAll(".mapPath").data(geojson.features).enter().append("path")
-			.attr("fill", (d, i)=>thisChart.fillFunction(d, i));
+		this._pathSelection = this._selection.selectAll(".mapPath").data(geojson.features).enter().append("path")
+			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.pathSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._pathSelection, attributes, onEvents);
 	}
 	
 	/** 
@@ -111,11 +162,11 @@ class Map extends Chart {
 	setData(dataset, attributes, onEvents) {
 		var thisChart = this;
 		
-		this.pathSelection.data(dataset)
-			.attr("fill", (d, i)=>thisChart.fillFunction(d, i));
+		this._pathSelection.data(dataset)
+			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.pathSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._pathSelection, attributes, onEvents);
 	}
 	
 	/** 
@@ -135,24 +186,24 @@ class Map extends Chart {
 		Chart.addIfNull(attributes, "cx", 10);
 		Chart.addIfNull(attributes, "cy", 10);
 		
-		this.dotSelection = this.tag.selectAll(".mapDot").data(dataset).enter().append("circle")
-			.attr("fill", (d, i)=>thisChart.fillFunction(d, i));
+		this._dotSelection = this._selection.selectAll(".mapDot").data(dataset).enter().append("circle")
+			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.dotSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
 	}
 	
 	/** 
 	 * Clears the chart, removing all paths and dots.
 	 */
 	clear() {
-		if (this.pathSelection) {
-			this.pathSelection.remove();
-			this.pathSelection = null;
+		if (this._pathSelection) {
+			this._pathSelection.remove();
+			this._pathSelection = null;
 		}
-		if (this.dotSelection) {
-			this.dotSelection.remove();
-			this.dotSelection = null;
+		if (this._dotSelection) {
+			this._dotSelection.remove();
+			this._dotSelection = null;
 		}
 		if (this.labels) {
 			this.labels.tag.remove();

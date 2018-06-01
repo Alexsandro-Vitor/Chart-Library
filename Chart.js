@@ -20,73 +20,103 @@
 	 * @param {string} tagClass - The type of chart.
 	 */
 	constructor(container, id, position, margins, dimensions, tagClass) {
-		/**
-		 * The tag in which the chart will be inserted.
-		 * @member {d3.selection} Chart#container
-		 */
-		this.container = container;
+		this._container = container;
 		
-		/**
-		 * The id of the chart tag.
-		 * @member {string} Chart#id
-		 */
-		this.id = id;
+		this._id = id;
 		
-		/**
-		 * The X coordinate of the chart.
-		 * @member {number} Chart#x
-		 */
-		/**
-		 * The Y coordinate of the chart.
-		 * @member {number} Chart#y
-		 */
 		if ((position == null) || (typeof(position) != "object")) {
-			this.x = 0;
-			this.y = 0;
+			this._x = 0;
+			this._y = 0;
 		} else {
-			this.x = position.x;
-			this.y = position.y;
+			this._x = position.x;
+			this._y = position.y;
 		}
 		
-		/**
-		 * The margins of the chart.
-		 * @member {Object} Chart#margins
-		 */
 		if (margins == null) {
-			this.margins = {left:10, right:10, top:10, bottom:10};
+			this._margins = {left:10, right:10, top:10, bottom:10};
 		} else if (typeof(margins) == "number") {
-			this.margins = {left:margins, right:margins, top:margins, bottom:margins};
+			this._margins = {left:margins, right:margins, top:margins, bottom:margins};
 		} else {
-			this.margins = margins;
+			this._margins = margins;
 		}
-		this.margins.left += this.x;
-		this.margins.top += this.y;
+		this._margins.left += this._x;
+		this._margins.top += this._y;
 		
-		/**
-		 * The inside width of the margin.
-		 * @member {number} Chart#width
-		 */
-		/**
-		 * The inside height of the margin.
-		 * @member {number} Chart#height
-		 */
 		if (dimensions == null) {
-			this.width = container.attr("width") - this.margins.left - this.margins.right + this.x;
-			this.height = container.attr("height") - this.margins.top - this.margins.bottom + this.y;
+			this._width = container.attr("width") - this._margins.left - this._margins.right + this._x;
+			this._height = container.attr("height") - this._margins.top - this._margins.bottom + this._y;
 		} else {
-			this.width = dimensions.width - this.margins.left - this.margins.right;
-			this.height = dimensions.height - this.margins.top - this.margins.bottom;
+			this._width = dimensions.width - this._margins.left - this._margins.right;
+			this._height = dimensions.height - this._margins.top - this._margins.bottom;
 		}
 		
-		/**
-		 * The selection of the chart.
-		 * @member {d3.selection} Chart#tag
-		 * @default d3.selectAll("." + tagClass).select("#" + this.id)
-		 */
-		this.tag = this.container.append("g")
-			.attr("id", this.id)
+		this._selection = this._container.append("g")
+			.attr("id", this._id)
 			.attr("class", tagClass)
-			.attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
+			.attr("transform", "translate(" + this._margins.left + "," + this._margins.top + ")");
+	}
+	
+	/**
+	 * Returns a selection of the tag containing this chart.
+	 * @returns {d3.selection} The container of this chart.
+	 */
+	container() {
+		return this._container;
+	}
+	
+	/**
+	 * If a value is given, sets the id, otherwise returns this chart's id.
+	 * @param {string} id - The new id of the chart.
+	 * @returns {(Chart|string)} This object or the current id.
+	 */
+	id(id) {
+		if (id) {
+			this._id = id;
+			this._selection.attr("id", id);
+			return this;
+		} else {
+			return this._id;
+		}
+	}
+	
+	/**
+	 * Returns the coordinates of the origin of the chart.
+	 * @returns {number[]} The chart's coordinates.
+	 */
+	position() {
+		return [this._x, this._y];
+	}
+	
+	/**
+	 * Returns the margins of the chart.
+	 * @returns {Object} The margins of the chart.
+	 */
+	margins() {
+		return this._margins;
+	}
+		
+	/**
+	 * The inside width of the margin.
+	 * @returns {number} The width of the chart.
+	 */
+	width() {
+		return this._width;
+	}
+	
+	/**
+	 * The inside height of the margin.
+	 * @returns {number} The height of the chart.
+	 */
+	height() {
+		return this._height;
+	}
+	
+	/**
+	 * Returns the selection of the tag of the chart.
+	 * @returns {d3.selection} The selection of this chart.
+	 */
+	selection() {
+		return this._selection;
 	}
 	
 	/** 

@@ -25,17 +25,17 @@ class Scatterplot extends Chart {
 		/**
 		 * The X scale of the chart.
 		 * @member {d3.scale} Scatterplot#xScale
-		 * @default d3.scaleLinear().range([0, this.width])
+		 * @default d3.scaleLinear().range([0, this.width()])
 		 */
 		this.xScale = d3.scaleLinear()
-			.range([0, this.width]);
+			.range([0, this._width]);
 		/**
 		 * The Y scale of the chart.
 		 * @member {d3.scale} Scatterplot#yScale
-		 * @default d3.scaleLinear().range([this.height, 0])
+		 * @default d3.scaleLinear().range([this.height(), 0])
 		 */
 		this.yScale = d3.scaleLinear()
-			.range([this.height, 0]);
+			.range([this._height, 0]);
 		/**
 		 * The top X axis of the chart.
 		 * @member {d3.axis} Scatterplot#xAxisTop
@@ -63,7 +63,7 @@ class Scatterplot extends Chart {
 		this.xAxisBottomGroup = this.tag
 			.append("g")
 			.attr("class", "xAxis")
-			.attr("transform", "translate(0, " + this.height + ")");
+			.attr("transform", "translate(0, " + this._height + ")");
 		this.xAxisBottomGroup.call(this.xAxisBottom);
 		/**
 		 * The left Y axis of the chart.
@@ -92,7 +92,7 @@ class Scatterplot extends Chart {
 		this.yAxisRightGroup = this.tag
 			.append("g")
 			.attr("class", "yAxis")
-			.attr("transform", "translate(" + this.width + ", 0)");
+			.attr("transform", "translate(" + this._width + ", 0)");
 		this.yAxisRightGroup.call(this.yAxisRight);
 		/**
 		 * The dots of the scatterplot.

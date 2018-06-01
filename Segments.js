@@ -32,10 +32,10 @@ class Segments extends Chart {
 		/**
 		 * The X scale of the chart. Used by the axis.
 		 * @member {d3.scale} Segments#xAxisScale
-		 * @default d3.scaleOrdinal().range([0, this.width])
+		 * @default d3.scaleOrdinal().range([0, this.width()])
 		 */
 		this.xAxisScale = d3.scaleOrdinal()
-			.range([0, this.width]);
+			.range([0, this._width]);
 		/**
 		 * The X axis of the chart.
 		 * @member {d3.axis} Segments#xAxis
@@ -46,19 +46,19 @@ class Segments extends Chart {
 		 * The group of the X axis.
 		 * @member {d3.selection} Segments#xAxisGroup
 		 */
-		this.xAxisGroup = this.tag
+		this.xAxisGroup = this._selection
 			.append("g")
 			.attr("class", "xAxis")
-			.attr("transform", "translate(0," + this.height  + ")");
+			.attr("transform", "translate(0," + this._height  + ")");
 		this.xAxisGroup.call(this.xAxis);
 		
 		/**
 		 * The Y scale of the chart. Used by the axis and the columns.
 		 * @member {d3.scale} Segments#yScale
-		 * @default d3.scaleLinear().range([this.height, 0])
+		 * @default d3.scaleLinear().range([this.height(), 0])
 		 */
 		this.yScale = d3.scaleLinear()
-			.range([this.height, 0]);
+			.range([this._height, 0]);
 		/**
 		 * The Y axis of the chart.
 		 * @member {d3.axis} Segments#yAxis
@@ -69,7 +69,7 @@ class Segments extends Chart {
 		 * The group of the Y axis.
 		 * @member {d3.selection} Segments#yAxisGroup
 		 */
-		this.yAxisGroup = this.tag
+		this.yAxisGroup = this._selection
 			.append("g")
 			.attr("class","yAxis");
 		this.yAxisGroup.call(this.yAxis);
@@ -140,7 +140,7 @@ class Segments extends Chart {
 	 */
 	setXDomain(newDomain) {
 		this.xAxisNames = newDomain.slice();
-		var sequence = Chart.genSequence(0, newDomain.length, this.width);
+		var sequence = Chart.genSequence(0, newDomain.length, this._width);
 		this.xAxisScale
 			.domain(newDomain)
 			.range(sequence);
@@ -149,7 +149,7 @@ class Segments extends Chart {
 		
 		this.xScale
 			.domain([0, this.xAxisNames.length-1])
-			.range([0, this.width]);
+			.range([0, this._width]);
 	}
 	
 	/** 
@@ -168,7 +168,7 @@ class Segments extends Chart {
 		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.segPathGenerator(d)));
 		Chart.addIfNull(attributes, "stroke", "black");
 		
-		this.segSelection = this.tag.selectAll(".segment").data(dataset).enter().append("path")
+		this.segSelection = this._selection.selectAll(".segment").data(dataset).enter().append("path")
 			.attr("fill", "transparent");
 		
 		//Insertion of attributes and events
@@ -193,7 +193,7 @@ class Segments extends Chart {
 		Chart.addIfNull(attributes, "cy", (d, i)=>thisChart.yScale(d));
 		
 		//Creating the groups
-		this.dotSelection = this.tag.selectAll(".dotGroup").data(dataset).enter().append("g")
+		this.dotSelection = this._selection.selectAll(".dotGroup").data(dataset).enter().append("g")
 			.attr("id", attributes["id"])
 			.attr("class", attributes["class"])
 			.attr("fill", (d, i)=>(thisChart.dotColorScale(i % thisChart.dotColorScale.domain().length)))
@@ -223,7 +223,7 @@ class Segments extends Chart {
 		attributes["class"] = "range";
 		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.rangePathGenerator(d)));
 		
-		this.rangeSelection = this.tag.selectAll(".range").data(dataset).enter().append("path")
+		this.rangeSelection = this._selection.selectAll(".range").data(dataset).enter().append("path")
 			.attr("fill", (d, i)=>(thisChart.rangeColorScale(i % thisChart.rangeColorScale.domain().length)));
 		
 		//Insertion of attributes and events

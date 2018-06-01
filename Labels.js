@@ -20,7 +20,7 @@ class Labels extends Chart {
 	 * @param {number} dimensions.height - The height of the chart, counting the margins.
 	 */
 	constructor(chart, id, position, margins, dimensions) {
-		super(chart.tag, id, position, margins, dimensions, "labels");
+		super(chart.selection(), id, position, margins, dimensions, "labels");
 		
 		/**
 		 * The chart of this label table.
@@ -45,10 +45,10 @@ class Labels extends Chart {
 		 * @member {d3.selection} Label#border
 		 * @default d3.select("#" + this.chart.id).select("#" + this.id).select(".border")
 		 */
-		this.border = this.tag.append("rect")
+		this.border = this._selection.append("rect")
 			.attr("class", "border")
-			.attr("width", this.width)
-			.attr("height", this.height)
+			.attr("width", this._width)
+			.attr("height", this._height)
 			.attr("stroke", "black")
 			.attr("fill", "white");
 	}
@@ -67,11 +67,11 @@ class Labels extends Chart {
 		if (colorAttributes == null) colorAttributes = [];
 		colorAttributes["class"] = "colorPlot";
 		Chart.addIfNull(colorAttributes, "x", 0);
-		Chart.addIfNull(colorAttributes, "y", (d, i)=>(i * thisChart.height / colors.length));
-		Chart.addIfNull(colorAttributes, "width", thisChart.height / colors.length);
-		Chart.addIfNull(colorAttributes, "height", thisChart.height / colors.length);
+		Chart.addIfNull(colorAttributes, "y", (d, i)=>(i * thisChart._height / colors.length));
+		Chart.addIfNull(colorAttributes, "width", thisChart._height / colors.length);
+		Chart.addIfNull(colorAttributes, "height", thisChart._height / colors.length);
 		
-		this.colorSelection = this.tag.selectAll("colorPlot").data(colors).enter().append("rect")
+		this.colorSelection = this._selection.selectAll("colorPlot").data(colors).enter().append("rect")
 			.attr("fill", (d, i)=>d);
 		
 		//Insertion of attributes
@@ -82,10 +82,10 @@ class Labels extends Chart {
 		valueAttributes["class"] = "colorLabel";
 		Chart.addIfNull(valueAttributes, "x", colorAttributes["width"] + 5);
 		Chart.addIfNull(valueAttributes, "y", colorAttributes["y"]);
-		Chart.addIfNull(valueAttributes, "width", thisChart.width - valueAttributes["x"]);
+		Chart.addIfNull(valueAttributes, "width", thisChart._width - valueAttributes["x"]);
 		Chart.addIfNull(valueAttributes, "height", colorAttributes["height"]);
 		
-		this.textSelection = this.tag.selectAll("colorLabel").data(values).enter().append("text")
+		this.textSelection = this._selection.selectAll("colorLabel").data(values).enter().append("text")
 			.text(d=>d)
 			.attr("dominant-baseline", "hanging");
 		

@@ -32,10 +32,10 @@ class Histogram extends Chart {
 		/**
 		 * The X scale of the histogram. Used by the axis.
 		 * @member {d3.scale} Histogram#xAxisScale
-		 * @default d3.scaleOrdinal().range([0, this.width])
+		 * @default d3.scaleOrdinal().range([0, this.width()])
 		 */
 		this.xAxisScale = d3.scaleOrdinal()
-			.range([0, this.width]);
+			.range([0, this._width]);
 		/**
 		 * The X axis of the histogram.
 		 * @member {d3.axis} Histogram#xAxis
@@ -46,19 +46,19 @@ class Histogram extends Chart {
 		 * The group of the X axis.
 		 * @member {d3.selection} Histogram#xAxisGroup
 		 */
-		this.xAxisGroup = this.tag
+		this.xAxisGroup = this._selection
 			.append("g")
 			.attr("class", "xAxis")
-			.attr("transform", "translate(0," + this.height  + ")");
+			.attr("transform", "translate(0," + this._height  + ")");
 		this.xAxisGroup.call(this.xAxis);
 		
 		/**
 		 * The Y scale of the histogram. Used by the axis and the columns.
 		 * @member {d3.scale} Histogram#yScale
-		 * @default d3.scaleLinear().range([this.height, 0])
+		 * @default d3.scaleLinear().range([this.height(), 0])
 		 */
 		this.yScale = d3.scaleLinear()
-			.range([this.height, 0]);
+			.range([this._height, 0]);
 		/**
 		 * The Y axis of the histogram.
 		 * @member {d3.axis} Histogram#yAxis
@@ -69,7 +69,7 @@ class Histogram extends Chart {
 		 * The group of the Y axis.
 		 * @member {d3.selection} Histogram#yAxisGroup
 		 */
-		this.yAxisGroup = this.tag
+		this.yAxisGroup = this._selection
 			.append("g")
 			.attr("class", "yAxis");
 		this.yAxisGroup.call(this.yAxis);
@@ -104,7 +104,7 @@ class Histogram extends Chart {
 		this.xAxisNames = newDomain.slice();
 		newDomain.push("");
 		newDomain.unshift("");
-		var sequence = Chart.genSequence(0, newDomain.length, this.width);
+		var sequence = Chart.genSequence(0, newDomain.length, this._width);
 		this.xAxisScale
 			.domain(newDomain)
 			.range(sequence);
@@ -123,7 +123,7 @@ class Histogram extends Chart {
 	 * @param {Object} onEvents - An object containing functions for events.
 	 */
 	setData(dataset, attributes, onEvents) {
-		var colWidth = this.width / (this.xAxisNames.length + 1);
+		var colWidth = this._width / (this.xAxisNames.length + 1);
 		var thisChart = this;
 		if (attributes == null) attributes = [];
 		
@@ -136,10 +136,10 @@ class Histogram extends Chart {
 		Chart.addIfNull(attributes, "x", (d, i)=>(thisChart.xScale(i) - colWidth/2));
 		Chart.addIfNull(attributes, "y", (d, i)=>(thisChart.yScale(d)));
 		Chart.addIfNull(attributes, "width", colWidth);
-		Chart.addIfNull(attributes, "height", (d, i)=>(thisChart.height - thisChart.yScale(d)));
+		Chart.addIfNull(attributes, "height", (d, i)=>(thisChart._height - thisChart.yScale(d)));
 		
 		//Column selection and color setting
-		this.colSelection = this.tag.selectAll(".column").data(dataset).enter().append("rect")
+		this.colSelection = this._selection.selectAll(".column").data(dataset).enter().append("rect")
 			.attr("fill", (d, i)=>(thisChart.colorScale(i % thisChart.colorScale.domain().length)));
 		
 		//Insertion of attributes and events

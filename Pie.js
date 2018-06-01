@@ -22,7 +22,7 @@ class Pie extends Chart {
 	constructor(container, id, position, margins, dimensions) {
 		super(container, id, position, margins, dimensions, "pieChart");
 		
-		this.tag.attr("transform", "translate(" + (this.margins.left + this.width / 2) + "," + (this.margins.top + this.height / 2) + ")");
+		this._selection.attr("transform", "translate(" + (this._margins.left + this._width / 2) + "," + (this._margins.top + this._height / 2) + ")");
 		
 		/**
 		 * The slices of the pie.
@@ -45,9 +45,9 @@ class Pie extends Chart {
 		/**
 		 * Function which sets the outer radius of the slice based on its value.
 		 * @member {function} Pie#outerRadius
-		 * @default (d, i)=>(d3.min([this.width, this.height]) / 2)
+		 * @default (d, i)=>(d3.min([this.width(), this.height()]) / 2)
 		 */
-		this.outerRadius = (d, i)=>(d3.min([this.width, this.height]) / 2);
+		this.outerRadius = (d, i)=>(d3.min([this._width, this._height]) / 2);
 		
 		/**
 		 * The color scale of the pie chart. Used to set the colors of each slice.
@@ -76,7 +76,7 @@ class Pie extends Chart {
 		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genSlice(d, i)()));
 		
 		//Slice sliceSelection and color setting
-		this.sliceSelection = this.tag.selectAll(".slice").data(dataset).enter().append("path")
+		this.sliceSelection = this._selection.selectAll(".slice").data(dataset).enter().append("path")
 			.attr("fill", (d, i)=>(thisChart.colorScale(i % thisChart.colorScale.domain().length)));
 		
 		//Insertion of attributes and events
@@ -103,7 +103,7 @@ class Pie extends Chart {
 		Chart.addIfNull(attributes, "text-anchor", "middle");
 		Chart.addIfNull(attributes, "dominant-baseline", "middle");
 		
-		this.labelSelection = this.tag.selectAll(".sliceLabel").data(labels).enter().append("text")
+		this.labelSelection = this._selection.selectAll(".sliceLabel").data(labels).enter().append("text")
 			.text((d, i)=>d);
 		
 		//Insertion of attributes and events
