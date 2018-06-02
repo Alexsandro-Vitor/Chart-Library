@@ -203,7 +203,7 @@ class Map extends Chart {
 	}
 	
 	/** 
-	 * Clears the chart, removing paths, dots and label tables.
+	 * Clears the chart, removing all plottings.
 	 * @returns {Map} This chart.
 	 */
 	clear() {

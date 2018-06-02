@@ -54,7 +54,7 @@ class Pie extends Chart {
 	
 	/**
 	 * Function which sets the inner radius of the slice based on its value. If func is given, sets it, otherwise returns the current innerRadius.
-	 * @param {function} scale - The new innerRadius.
+	 * @param {function} func - The new innerRadius.
 	 * @returns {(Pie|function)} This object or the current innerRadius.
 	 */
 	innerRadius(func) {
@@ -68,7 +68,7 @@ class Pie extends Chart {
 	
 	/**
 	 * Function which sets the outer radius of the slice based on its value. If func is given, sets it, otherwise returns the current outerRadius.
-	 * @param {function} scale - The new outerRadius.
+	 * @param {function} func - The new outerRadius.
 	 * @returns {(Pie|function)} This object or the current outerRadius.
 	 */
 	outerRadius(func) {
@@ -164,7 +164,7 @@ class Pie extends Chart {
 	}
 	
 	/** 
-	 * Clears the chart, removing all slices, slice labels and label tables.
+	 * Clears the chart, removing all plottings.
 	 * @returns {Pie} This chart.
 	 */
 	clear() {

@@ -22,91 +22,97 @@ class Scatterplot extends Chart {
 	constructor(container, id, position, margins, dimensions) {
 		super(container, id, position, margins, dimensions, "scatteplotChart");
 		
-		/**
-		 * The X scale of the chart.
-		 * @member {d3.scale} Scatterplot#xScale
-		 * @default d3.scaleLinear().range([0, this.width()])
-		 */
-		this.xScale = d3.scaleLinear()
+		this._xScale = d3.scaleLinear()
 			.range([0, this._width]);
-		/**
-		 * The Y scale of the chart.
-		 * @member {d3.scale} Scatterplot#yScale
-		 * @default d3.scaleLinear().range([this.height(), 0])
-		 */
-		this.yScale = d3.scaleLinear()
-			.range([this._height, 0]);
-		/**
-		 * The top X axis of the chart.
-		 * @member {d3.axis} Scatterplot#xAxisTop
-		 * @default d3.axisTop(this.xScale)
-		 */
-		this.xAxisTop = d3.axisTop(this.xScale);
-		/**
-		 * The bottom X axis of the chart.
-		 * @member {d3.axis} Scatterplot#xAxisBottom
-		 * @default d3.axisBottom(this.xScale
-		 */
-		this.xAxisBottom = d3.axisBottom(this.xScale);
-		/**
-		 * The group of the top X axis.
-		 * @member {d3.selection} Scatterplot#xAxisTopGroup
-		 */
-		this.xAxisTopGroup = this.tag
+		
+		this._xAxisTop = d3.axisTop(this._xScale);
+		this._xAxisTopGroup = this._selection
 			.append("g")
 			.attr("class", "xAxis");
-		this.xAxisTopGroup.call(this.xAxisTop);
-		/**
-		 * The group of the bottom X axis.
-		 * @member {d3.selection} Scatterplot#xAxisBottomGroup
-		 */
-		this.xAxisBottomGroup = this.tag
+		this._xAxisTopGroup.call(this._xAxisTop);
+		
+		this._xAxisBottom = d3.axisBottom(this._xScale);
+		this._xAxisBottomGroup = this._selection
 			.append("g")
 			.attr("class", "xAxis")
 			.attr("transform", "translate(0, " + this._height + ")");
-		this.xAxisBottomGroup.call(this.xAxisBottom);
-		/**
-		 * The left Y axis of the chart.
-		 * @member {d3.axis} Scatterplot#yAxisLeft
-		 * @default d3.axisLeft(this.yScale)
-		 */
-		this.yAxisLeft = d3.axisLeft(this.yScale);
-		/**
-		 * The right Y axis of the chart.
-		 * @member {d3.axis} Scatterplot#yAxisRight
-		 * @default d3.axisRight(this.yScale)
-		 */
-		this.yAxisRight = d3.axisRight(this.yScale);
-		/**
-		 * The group of the left Y axis.
-		 * @member {d3.selection} Scatterplot#yAxisLeftGroup
-		 */
-		this.yAxisLeftGroup = this.tag
+		this._xAxisBottomGroup.call(this._xAxisBottom);
+		
+		this._yScale = d3.scaleLinear()
+			.range([this._height, 0]);
+		
+		this._yAxisLeft = d3.axisLeft(this._yScale);
+		this._yAxisLeftGroup = this._selection
 			.append("g")
 			.attr("class", "yAxis")
-		this.yAxisLeftGroup.call(this.yAxisLeft);
-		/**
-		 * The group of the right Y axis.
-		 * @member {d3.selection} Scatterplot#yAxisRightGroup
-		 */
-		this.yAxisRightGroup = this.tag
+		this._yAxisLeftGroup.call(this._yAxisLeft);
+		
+		this._yAxisRight = d3.axisRight(this._yScale);
+		this._yAxisRightGroup = this._selection
 			.append("g")
 			.attr("class", "yAxis")
 			.attr("transform", "translate(" + this._width + ", 0)");
-		this.yAxisRightGroup.call(this.yAxisRight);
-		/**
-		 * The dots of the scatterplot.
-		 * @member {d3.selection} Scatterplot#dotSelection
-		 */
-		this.dotSelection = null;
-		/**
-		 * The color scale of the scatterplot. Used to set the colors of each dot.
-		 * @member {d3.scale} Scatterplot#colorScale
-		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1)).range(d3.schemeCategory10)
-		 */
-		this.colorScale = d3.scaleLinear()
+		this._yAxisRightGroup.call(this._yAxisRight);
+		
+		this._dotSelection = null;
+		
+		this._colorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
 			.range(d3.schemeCategory10);
+	}
+	
+	/**
+	 * The X scale of the chart. If scale is given, sets it and also sets the X axes, otherwise returns the current xScale.
+	 * @param {d3.scale} scale - The new xScale.
+	 * @returns {(Pie|d3.scale)} This object or the current xScale.
+	 */
+	xScale(scale) {
+		if (scale) {
+			this._xScale = scale;
+			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.min(this._xScale.domain(), d3.max(this._xScale.domain())));
+			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.min(this._xScale.domain(), d3.max(this._xScale.domain())));
+			return this;
+		} else {
+			return this._xScale;
+		}
+	}
+	
+	/**
+	 * The Y scale of the chart. If scale is given, sets it and also sets the Y axes, otherwise returns the current yScale.
+	 * @param {d3.scale} scale - The new yScale.
+	 * @returns {(Pie|d3.scale)} This object or the current yScale.
+	 */
+	yScale(scale) {
+		if (scale) {
+			this._yScale = scale;
+			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.min(this._yScale.domain(), d3.max(this._yScale.domain())));
+			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.min(this._yScale.domain(), d3.max(this._yScale.domain())));
+			return this;
+		} else {
+			return this._yScale;
+		}
+	}
+	
+	/**
+	 * Returns the selection of the dots of the chart.
+	 * @returns {d3.selection} The dots of this chart.
+	 */
+	dotSelection() {
+		return this._dotSelection;
+	}
+	
+	/**
+	 * The color scale of the scatterplot. Used to set the colors of each dot. If scale is given, sets it, otherwise returns the current colorScale.
+	 * @param {d3.scale} scale - The new colorScale.
+	 * @returns {(Pie|d3.scale)} This object or the current colorScale.
+	 */
+	colorScale(scale) {
+		if (scale) {
+			this._colorScale = scale;
+			return this;
+		} else {
+			return this._colorScale;
+		}
 	}
 	
 	/** 
@@ -119,34 +125,39 @@ class Scatterplot extends Chart {
 		var thisChart = this;
 		
 		//Adjusting the scales and axis
-		Chart.adjustScaleDomain(this.xScale, this.xAxisTop, this.xAxisTopGroup, d3.min(dataset.map(d=>d[0])), d3.max(dataset.map(d=>d[0])));
-		Chart.adjustScaleDomain(this.xScale, this.xAxisBottom, this.xAxisBottomGroup, d3.min(dataset.map(d=>d[0])), d3.max(dataset.map(d=>d[0])));
-		Chart.adjustScaleDomain(this.yScale, this.yAxisLeft, this.yAxisLeftGroup, d3.min(dataset.map(d=>d[1])), d3.max(dataset.map(d=>d[1])));
-		Chart.adjustScaleDomain(this.yScale, this.yAxisLeft, this.yAxisLeftGroup, d3.min(dataset.map(d=>d[1])), d3.max(dataset.map(d=>d[1])));
+		let minMaxX = d3.extent(dataset.map(d=>d[0]));
+		let minMaxY = d3.extent(dataset.map(d=>d[1]));
+		Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup, minMaxX[0], minMaxX[1]);
+		Chart.adjustScaleDomain(this._xScale, this._xAxisBottom, this._xAxisBottomGroup, minMaxX[0], minMaxX[1]);
+		Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, minMaxY[0], minMaxY[1]);
+		Chart.adjustScaleDomain(this._yScale, this._yAxisRight, this._yAxisRightGroup, minMaxY[0], minMaxY[1]);
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("dot" + i));
 		attributes["class"] = "dot";
-		Chart.addIfNull(attributes, "cx", (d, i)=>(thisChart.xScale(d[0])));
-		Chart.addIfNull(attributes, "cy", (d, i)=>(thisChart.yScale(d[1])));
+		Chart.addIfNull(attributes, "cx", (d, i)=>(thisChart._xScale(d[0])));
+		Chart.addIfNull(attributes, "cy", (d, i)=>(thisChart._yScale(d[1])));
 		Chart.addIfNull(attributes, "r", "4px");
 		
 		//Dot selection and color setting
-		this.dotSelection = this.tag.selectAll(".dot").data(dataset).enter().append("circle")
-			.attr("fill", (d, i)=>(thisChart.colorScale(i % thisChart.colorScale.domain().length)));
+		this._dotSelection = this._selection.selectAll(".dot").data(dataset).enter().append("circle")
+			.attr("fill", (d, i)=>(thisChart._colorScale(i % thisChart._colorScale.domain().length)));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.dotSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
 	}
 	
 	/** 
-	 * Clears the chart, removing all paths and dots.
+	 * Clears the chart, removing all plottings.
+	 * @returns {Scatterplot} This chart.
 	 */
 	clear() {
-		if (this.dotSelection) {
-			this.dotSelection.remove();
-			this.dotSelection = null;
+		if (this._dotSelection) {
+			this._dotSelection.remove();
+			this._dotSelection = null;
 		}
+		
+		return super.clear();
 	}
 }
