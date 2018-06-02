@@ -39,12 +39,10 @@
 		} else {
 			this._margins = margins;
 		}
-		this._margins.left += this._x;
-		this._margins.top += this._y;
 		
 		if (dimensions == null) {
-			this._width = container.attr("width") - this._margins.left - this._margins.right + this._x;
-			this._height = container.attr("height") - this._margins.top - this._margins.bottom + this._y;
+			this._width = container.attr("width") - this._margins.left - this._margins.right;
+			this._height = container.attr("height") - this._margins.top - this._margins.bottom;
 		} else {
 			this._width = dimensions.width - this._margins.left - this._margins.right;
 			this._height = dimensions.height - this._margins.top - this._margins.bottom;
@@ -53,7 +51,7 @@
 		this._selection = this._container.append("g")
 			.attr("id", this._id)
 			.attr("class", tagClass)
-			.attr("transform", "translate(" + this._margins.left + "," + this._margins.top + ")");
+			.attr("transform", "translate(" + (this._margins.left + this._x) + "," + (this._margins.top + this._y) + ")");
 	}
 	
 	/**
