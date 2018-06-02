@@ -140,7 +140,7 @@ class Segments extends Chart {
 	 */
 	setXDomain(newDomain) {
 		this.xAxisNames = newDomain.slice();
-		var sequence = Chart.genSequence(0, newDomain.length, this._width);
+		let sequence = Chart.genSequence(0, newDomain.length, this._width);
 		this.xAxisScale
 			.domain(newDomain)
 			.range(sequence);
@@ -159,7 +159,7 @@ class Segments extends Chart {
 	 * @param {Object} onEvents - An object containing functions for events.
 	 */
 	setSegments(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
@@ -182,7 +182,7 @@ class Segments extends Chart {
 	 * @param {Object} onEvents - An object containing functions for events.
 	 */
 	setDots(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
@@ -215,7 +215,7 @@ class Segments extends Chart {
 	 * @param {Object} onEvents - An object containing functions for events.
 	 */
 	setRanges(dataset, attributes, onEvents) {		
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];

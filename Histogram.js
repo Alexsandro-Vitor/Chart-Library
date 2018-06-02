@@ -104,7 +104,7 @@ class Histogram extends Chart {
 		this.xAxisNames = newDomain.slice();
 		newDomain.push("");
 		newDomain.unshift("");
-		var sequence = Chart.genSequence(0, newDomain.length, this._width);
+		let sequence = Chart.genSequence(0, newDomain.length, this._width);
 		this.xAxisScale
 			.domain(newDomain)
 			.range(sequence);
@@ -123,12 +123,12 @@ class Histogram extends Chart {
 	 * @param {Object} onEvents - An object containing functions for events.
 	 */
 	setData(dataset, attributes, onEvents) {
-		var colWidth = this._width / (this.xAxisNames.length + 1);
-		var thisChart = this;
+		let colWidth = this._width / (this.xAxisNames.length + 1);
+		let thisChart = this;
 		if (attributes == null) attributes = [];
 		
 		//Adjusting the yScale and axis
-		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, 0, d3.max(dataset));
+		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, [0, d3.max(dataset)]);
 		
 		//Mandatory attributes
 		Chart.addIfNull(attributes, "id", (d, i)=>("col" + thisChart.xAxisNames[i]));
@@ -151,11 +151,11 @@ class Histogram extends Chart {
 	 * @param {string[]} newColors - An array of colors for the colorScale to work with.
 	 */
 	setColorScale(newColors) {
-		var sequence = Chart.genSequence(0, newColors.length, newColors.length-1);
+		let sequence = Chart.genSequence(0, newColors.length, newColors.length-1);
 		this.colorScale
 			.domain(sequence)
 			.range(newColors);
-		var thisChart = this;
+		let thisChart = this;
 		if (this.colSelection != null) this.colSelection.attr("fill", (d, i)=>(thisChart.colorScale(i % newColors.length)));
 	}
 }

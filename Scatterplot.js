@@ -69,8 +69,8 @@ class Scatterplot extends Chart {
 	xScale(scale) {
 		if (scale) {
 			this._xScale = scale;
-			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.min(this._xScale.domain(), d3.max(this._xScale.domain())));
-			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.min(this._xScale.domain(), d3.max(this._xScale.domain())));
+			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
+			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
 			return this;
 		} else {
 			return this._xScale;
@@ -85,8 +85,8 @@ class Scatterplot extends Chart {
 	yScale(scale) {
 		if (scale) {
 			this._yScale = scale;
-			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.min(this._yScale.domain(), d3.max(this._yScale.domain())));
-			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.min(this._yScale.domain(), d3.max(this._yScale.domain())));
+			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
+			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
 			return this;
 		} else {
 			return this._yScale;
@@ -122,15 +122,15 @@ class Scatterplot extends Chart {
 	 * @param {Object} onEvents - An object containing functions for events.
 	 */
 	setData(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Adjusting the scales and axis
 		let minMaxX = d3.extent(dataset.map(d=>d[0]));
 		let minMaxY = d3.extent(dataset.map(d=>d[1]));
-		Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup, minMaxX[0], minMaxX[1]);
-		Chart.adjustScaleDomain(this._xScale, this._xAxisBottom, this._xAxisBottomGroup, minMaxX[0], minMaxX[1]);
-		Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, minMaxY[0], minMaxY[1]);
-		Chart.adjustScaleDomain(this._yScale, this._yAxisRight, this._yAxisRightGroup, minMaxY[0], minMaxY[1]);
+		Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup, minMaxX);
+		Chart.adjustScaleDomain(this._xScale, this._xAxisBottom, this._xAxisBottomGroup, minMaxX);
+		Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, minMaxY);
+		Chart.adjustScaleDomain(this._yScale, this._yAxisRight, this._yAxisRightGroup, minMaxY);
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];

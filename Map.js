@@ -136,7 +136,7 @@ class Map extends Chart {
 	 * @returns {Map} This chart.
 	 */
 	setMap(geojson, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Scales the projection to centralize the map
 		this._projection.fitExtent([[0, 0], [this._width, this._height]], geojson);
@@ -164,7 +164,7 @@ class Map extends Chart {
 	 * @returns {Map} This chart.
 	 */
 	setData(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		this._pathSelection.data(dataset)
 			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
@@ -183,7 +183,7 @@ class Map extends Chart {
 	 * @returns {Map} This chart.
 	 */
 	setDots(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];

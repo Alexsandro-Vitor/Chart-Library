@@ -77,7 +77,7 @@ class LabelTable extends Chart {
 	 * @returns {LabelTable} This label table.
 	 */
 	setValues(colors, values, colorAttributes, valueAttributes) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Mandatory attributes of the colors
 		if (colorAttributes == null) colorAttributes = [];

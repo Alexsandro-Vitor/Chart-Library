@@ -149,9 +149,9 @@
 	 * @returns {number[]} Array with equally distanced values.
 	 */
 	static genSequence(start, size, end) {
-		var output = [];
+		let output = [];
 		size--;
-		for (var i = 0; i <= size; i++) {
+		for (let i = 0; i <= size; i++) {
 			output.push(start + i * (end - start) / size);
 		}
 		return output;
@@ -162,11 +162,10 @@
 	 * @param {d3.scale} scale - The scale to be adjusted.
 	 * @param {d3.axis} axis - The axis which uses the scale.
 	 * @param {d3.selection} axisGroup - The group in which the axis is.
-	 * @param {number} minValue - The minimum value of the new domain.
-	 * @param {number} maxValue - The maximum value of the new domain.
+	 * @param {number[]} domain - The new domain of the scale.
 	 */
-	static adjustScaleDomain(scale, axis, axisGroup, minValue, maxValue) {
-		scale.domain([minValue, maxValue]);
+	static adjustScaleDomain(scale, axis, axisGroup, domain) {
+		scale.domain(domain);
 		axis.scale(scale);
 		axisGroup.call(axis);
 	}
@@ -189,12 +188,12 @@
 	 */
 	static insertAttributesEvents(selection, attributes, onEvents) {
 		//Setting attributes
-		for (var attrName in attributes) {
+		for (let attrName in attributes) {
 			selection.attr(attrName, attributes[attrName]);
 		}
 		
 		//Setting events
-		for (var eventName in onEvents) {
+		for (let eventName in onEvents) {
 			selection.on(eventName, onEvents[eventName]);
 		}
 	}
