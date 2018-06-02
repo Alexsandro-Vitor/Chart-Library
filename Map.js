@@ -84,7 +84,7 @@ class Map extends Chart {
 	}
 	
 	/**
-	 * The scale between input values and the value used at colorScheme. Its range should stay at [0, 1]. If a scale is given sets the colorScale, otherwise returns the current projection.
+	 * The scale between input values and the value used at colorScheme. Its range should stay at [0, 1]. If a scale is given sets the colorScale, otherwise returns the current colorScale.
 	 * @param {d3.scale} scale - The new colorScale.
 	 * @returns {(Map|d3.projection)} This object or the current colorScale.
 	 */

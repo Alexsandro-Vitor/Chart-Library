@@ -24,39 +24,74 @@ class Pie extends Chart {
 		
 		this._selection.attr("transform", "translate(" + (this._margins.left + this._width / 2) + "," + (this._margins.top + this._height / 2) + ")");
 		
-		/**
-		 * The slices of the pie.
-		 * @member {d3.selection} Pie#sliceSelection
-		 */
-		this.sliceSelection = null;
+		this._sliceSelection = null;
 		
-		/**
-		 * The labels of the slices.
-		 * @member {d3.selection} Pie#labelSelection
-		 */
-		this.labelSelection = null;
+		this._labelSelection = null;
 		
-		/**
-		 * Function which sets the inner radius of the slice based on its value.
-		 * @member {function} Pie#innerRadius
-		 * @default 0
-		 */
-		this.innerRadius = (d, i)=>0;
-		/**
-		 * Function which sets the outer radius of the slice based on its value.
-		 * @member {function} Pie#outerRadius
-		 * @default (d, i)=>(d3.min([this.width(), this.height()]) / 2)
-		 */
-		this.outerRadius = (d, i)=>(d3.min([this._width, this._height]) / 2);
+		this._innerRadius = (d, i)=>0;
+		this._outerRadius = (d, i)=>(d3.min([this._width, this._height]) / 2);
 		
-		/**
-		 * The color scale of the pie chart. Used to set the colors of each slice.
-		 * @member {d3.scale} Pie#colorScale
-		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1)).range(d3.schemeCategory10)
-		 */
-		this.colorScale = d3.scaleLinear()
+		this._colorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
 			.range(d3.schemeCategory10);
+	}
+	
+	/**
+	 * Returns the selection of the slices of the chart.
+	 * @returns {d3.selection} The slices of this chart.
+	 */
+	sliceSelection() {
+		return this._sliceSelection;
+	}
+	
+	/**
+	 * Returns the selection of the labels of each slice.
+	 * @returns {d3.selection} The labels of the slices.
+	 */
+	labelSelection() {
+		return this._labelSelection;
+	}
+	
+	/**
+	 * Function which sets the inner radius of the slice based on its value. If func is given, sets it, otherwise returns the current innerRadius.
+	 * @param {function} scale - The new innerRadius.
+	 * @returns {(Pie|function)} This object or the current innerRadius.
+	 */
+	innerRadius(func) {
+		if (func) {
+			this._innerRadius = func;
+			return this;
+		} else {
+			return this._innerRadius;
+		}
+	}
+	
+	/**
+	 * Function which sets the outer radius of the slice based on its value. If func is given, sets it, otherwise returns the current outerRadius.
+	 * @param {function} scale - The new outerRadius.
+	 * @returns {(Pie|function)} This object or the current outerRadius.
+	 */
+	outerRadius(func) {
+		if (func) {
+			this._outerRadius = func;
+			return this;
+		} else {
+			return this._outerRadius;
+		}
+	}
+	
+	/**
+	 * The color scale of the pie chart. Used to set the colors of each slice. If scale is given, sets it, otherwise returns the current colorScale.
+	 * @param {d3.scale} scale - The new colorScale.
+	 * @returns {(Pie|d3.scale)} This object or the current colorScale.
+	 */
+	colorScale(scale) {
+		if (scale) {
+			this._colorScale = scale;
+			return this;
+		} else {
+			return this._colorScale;
+		}
 	}
 	
 	/** 
@@ -77,11 +112,11 @@ class Pie extends Chart {
 		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genSlice(d, i)()));
 		
 		//Slice sliceSelection and color setting
-		this.sliceSelection = this._selection.selectAll(".slice").data(dataset).enter().append("path")
-			.attr("fill", (d, i)=>(thisChart.colorScale(i % thisChart.colorScale.domain().length)));
+		this._sliceSelection = this._selection.selectAll(".slice").data(dataset).enter().append("path")
+			.attr("fill", (d, i)=>(thisChart._colorScale(i % thisChart._colorScale.domain().length)));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.sliceSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._sliceSelection, attributes, onEvents);
 		
 		return this;
 	}
@@ -95,9 +130,7 @@ class Pie extends Chart {
 	 */
 	setSliceLabels(labels, attributes, onEvents) {
 		let thisChart = this;
-		let centroids = this.sliceSelection.data().map((d, i)=>this.genSlice(d, i).centroid());
-		console.log(this.sliceSelection.data());
-		console.log(centroids);
+		let centroids = this._sliceSelection.data().map((d, i)=>this.genSlice(d, i).centroid());
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
@@ -107,11 +140,11 @@ class Pie extends Chart {
 		Chart.addIfNull(attributes, "text-anchor", "middle");
 		Chart.addIfNull(attributes, "dominant-baseline", "middle");
 		
-		this.labelSelection = this._selection.selectAll(".sliceLabel").data(labels).enter().append("text")
+		this._labelSelection = this._selection.selectAll(".sliceLabel").data(labels).enter().append("text")
 			.text((d, i)=>d);
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.labelSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._labelSelection, attributes, onEvents);
 		
 		return this;
 	}
@@ -124,8 +157,8 @@ class Pie extends Chart {
 	 */
 	genSlice(d, i) {
 		return d3.arc()
-			.innerRadius(this.innerRadius(d, i))
-			.outerRadius(this.outerRadius(d, i))
+			.innerRadius(this._innerRadius(d, i))
+			.outerRadius(this._outerRadius(d, i))
 			.startAngle(this._pieData[i].startAngle)
 			.endAngle(this._pieData[i].endAngle);
 	}
@@ -135,18 +168,14 @@ class Pie extends Chart {
 	 * @returns {Pie} This chart.
 	 */
 	clear() {
-		if (this.sliceSelection) {
-			this.sliceSelection.remove();
-			this.sliceSelection = null;
+		if (this._sliceSelection) {
+			this._sliceSelection.remove();
+			this._sliceSelection = null;
 			this._pieData = null;
 		}
-		if (this.labelSelection) {
-			this.labelSelection.remove();
-			this.labelSelection = null;
-		}
-		if (this.labels) {
-			this.labels.tag.remove();
-			this.labels = null;
+		if (this._labelSelection) {
+			this._labelSelection.remove();
+			this._labelSelection = null;
 		}
 		return super.clear();
 	}
