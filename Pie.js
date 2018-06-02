@@ -64,6 +64,7 @@ class Pie extends Chart {
 	 * @param {number[]} dataset - An array of values for the slices.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the slices.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Pie} This chart.
 	 */
 	setData(dataset, attributes, onEvents) {
 		let thisChart = this;
@@ -81,6 +82,8 @@ class Pie extends Chart {
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this.sliceSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -88,6 +91,7 @@ class Pie extends Chart {
 	 * @param {string[]} labels - An array of values for the labels.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the labels.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Pie} This chart.
 	 */
 	setSliceLabels(labels, attributes, onEvents) {
 		let thisChart = this;
@@ -108,6 +112,8 @@ class Pie extends Chart {
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this.labelSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -125,7 +131,8 @@ class Pie extends Chart {
 	}
 	
 	/** 
-	 * Clears the chart, removing all slices and labels.
+	 * Clears the chart, removing all slices, slice labels and label tables.
+	 * @returns {Pie} This chart.
 	 */
 	clear() {
 		if (this.sliceSelection) {
@@ -141,5 +148,6 @@ class Pie extends Chart {
 			this.labels.tag.remove();
 			this.labels = null;
 		}
+		return super.clear();
 	}
 }

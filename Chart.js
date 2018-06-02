@@ -119,6 +119,30 @@
 		return this._selection;
 	}
 	
+	/**
+	 * The label table of the chart. If table is given, sets the label table. If no value is given, returns the current label table.
+	 * @param {LabelTable} table - The new label table.
+	 * @returns {(Chart|LabelTable})} - The new label table.
+	 */
+	labelTable(table) {
+		if (table !== undefined) {
+			this._labelTable = table;
+		}
+		return this._labelTable;
+	}
+	
+	/** 
+	 * Clears the chart, removing the label table.
+	 * @returns {Chart} This chart.
+	 */
+	clear() {
+		if (this._labelTable) {
+			this._labelTable.selection().remove();
+			this._labelTable = null;
+		}
+		return this;
+	}
+	
 	/** 
 	 * Generates an array with equally distanced values.
 	 * @param {number} start - The first value of the returned array.

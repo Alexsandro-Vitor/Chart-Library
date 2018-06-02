@@ -2,7 +2,7 @@
  * Class that represents a Label table.
  * @extends Chart
  */
-class Labels extends Chart {
+class LabelTable extends Chart {
 	/**
 	 * @constructor
 	 * @param {Chart} chart - The chart of this label table.
@@ -22,30 +22,13 @@ class Labels extends Chart {
 	constructor(chart, id, position, margins, dimensions) {
 		super(chart.selection(), id, position, margins, dimensions, "labels");
 		
-		/**
-		 * The chart of this label table.
-		 * @member {Chart} Label#chart
-		 */
-		this.chart = chart;
+		this._chart = chart;
 		
-		/**
-		 * The rects with the colors of the chart.
-		 * @member {d3.selection} Label#colorSelection
-		 */
-		this.colorSelection = null;
+		this._colorSelection = null;
 		
-		/**
-		 * The texts with the ranges for each color of the chart.
-		 * @member {d3.selection} Label#textSelection
-		 */
-		this.textSelection = null;
+		this._textSelection = null;
 		
-		/**
-		 * The border of the label table.
-		 * @member {d3.selection} Label#border
-		 * @default d3.select("#" + this.chart.id).select("#" + this.id).select(".border")
-		 */
-		this.border = this._selection.append("rect")
+		this._border = this._selection.append("rect")
 			.attr("class", "border")
 			.attr("width", this._width)
 			.attr("height", this._height)
@@ -54,11 +37,44 @@ class Labels extends Chart {
 	}
 	
 	/** 
+	 * The chart labelled by this label table.
+	 * @returns {Chart} The chart of this label table.
+	 */
+	chart() {
+		return this._chart;
+	}
+	
+	/**
+	 * Returns the selection of the rects with the color of the chart.
+	 * @returns {d3.selection} The colored rects of this chart.
+	 */
+	colorSelection() {
+		return this._colorSelection;
+	}
+	
+	/**
+	 * Returns the selection of the texts with the labels of the chart.
+	 * @returns {d3.selection} The text labels of this chart.
+	 */
+	textSelection() {
+		return this._textSelection;
+	}
+	
+	/**
+	 * Returns the selection of the border of the label table.
+	 * @returns {d3.selection} The border of this label table.
+	 */
+	border(rect) {
+		return this._border;
+	}
+	
+	/** 
 	 * Inserts data on the labels table.
 	 * @param {string[]} colors - An array of colors.
 	 * @param {(number[]|string[])} values - An array of labels for the colors.
 	 * @param {(function[]|number[])} colorAttributes - An object containing functions or constants for attributes of the color rects.
 	 * @param {(function[]|number[])} valueAttributes - An object containing functions or constants for attributes of the label texts.
+	 * @returns {LabelTable} This label table.
 	 */
 	setValues(colors, values, colorAttributes, valueAttributes) {
 		var thisChart = this;
@@ -71,11 +87,11 @@ class Labels extends Chart {
 		Chart.addIfNull(colorAttributes, "width", thisChart._height / colors.length);
 		Chart.addIfNull(colorAttributes, "height", thisChart._height / colors.length);
 		
-		this.colorSelection = this._selection.selectAll("colorPlot").data(colors).enter().append("rect")
+		this._colorSelection = this._selection.selectAll("colorPlot").data(colors).enter().append("rect")
 			.attr("fill", (d, i)=>d);
 		
 		//Insertion of attributes
-		Chart.insertAttributesEvents(this.colorSelection, colorAttributes, null);
+		Chart.insertAttributesEvents(this._colorSelection, colorAttributes, null);
 		
 		//Mandatory attributes of the texts
 		if (valueAttributes == null) valueAttributes = [];
@@ -85,11 +101,13 @@ class Labels extends Chart {
 		Chart.addIfNull(valueAttributes, "width", thisChart._width - valueAttributes["x"]);
 		Chart.addIfNull(valueAttributes, "height", colorAttributes["height"]);
 		
-		this.textSelection = this._selection.selectAll("colorLabel").data(values).enter().append("text")
+		this._textSelection = this._selection.selectAll("colorLabel").data(values).enter().append("text")
 			.text(d=>d)
 			.attr("dominant-baseline", "hanging");
 		
 		//Insertion of attributes
-		Chart.insertAttributesEvents(this.textSelection, valueAttributes, null);
+		Chart.insertAttributesEvents(this._textSelection, valueAttributes, null);
+		
+		return this;
 	}
 }

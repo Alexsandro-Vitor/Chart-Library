@@ -133,6 +133,7 @@ class Map extends Chart {
 	 * @param {Object} geojson - The data of a geojson file.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the map.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Map} This chart.
 	 */
 	setMap(geojson, attributes, onEvents) {
 		var thisChart = this;
@@ -151,6 +152,8 @@ class Map extends Chart {
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._pathSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -158,6 +161,7 @@ class Map extends Chart {
 	 * @param {number[][]} dataset - The data to be plotted on the map.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the map.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Map} This chart.
 	 */
 	setData(dataset, attributes, onEvents) {
 		var thisChart = this;
@@ -167,6 +171,8 @@ class Map extends Chart {
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._pathSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -174,6 +180,7 @@ class Map extends Chart {
 	 * @param {number[][]} dataset - The data to be plotted on the map.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the map.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Map} This chart.
 	 */
 	setDots(dataset, attributes, onEvents) {
 		var thisChart = this;
@@ -191,10 +198,13 @@ class Map extends Chart {
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
-	 * Clears the chart, removing all paths and dots.
+	 * Clears the chart, removing paths, dots and label tables.
+	 * @returns {Map} This chart.
 	 */
 	clear() {
 		if (this._pathSelection) {
@@ -205,9 +215,6 @@ class Map extends Chart {
 			this._dotSelection.remove();
 			this._dotSelection = null;
 		}
-		if (this.labels) {
-			this.labels.tag.remove();
-			this.labels = null;
-		}
+		return super.clear();
 	}
 }
