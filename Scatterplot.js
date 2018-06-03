@@ -120,6 +120,7 @@ class Scatterplot extends Chart {
 	 * @param {number[]} dataset - An array of values for the dots.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the dots.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Scatterplot} This chart.
 	 */
 	setData(dataset, attributes, onEvents) {
 		let thisChart = this;
@@ -146,6 +147,8 @@ class Scatterplot extends Chart {
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -157,7 +160,6 @@ class Scatterplot extends Chart {
 			this._dotSelection.remove();
 			this._dotSelection = null;
 		}
-		
 		return super.clear();
 	}
 }

@@ -125,12 +125,12 @@ class Histogram extends Chart {
 	setData(dataset, attributes, onEvents) {
 		let colWidth = this._width / (this.xAxisNames.length + 1);
 		let thisChart = this;
-		if (attributes == null) attributes = [];
 		
 		//Adjusting the yScale and axis
 		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, [0, d3.max(dataset)]);
 		
 		//Mandatory attributes
+		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("col" + thisChart.xAxisNames[i]));
 		attributes["class"] = "column";
 		Chart.addIfNull(attributes, "x", (d, i)=>(thisChart.xScale(i) - colWidth/2));

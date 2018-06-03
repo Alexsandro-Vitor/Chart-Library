@@ -80,21 +80,25 @@ class Segments extends Chart {
 		 */
 		this.xAxisNames = [];
 		
+		this._rangeLayer = this._selection.append("g");
+		this._segLayer = this._selection.append("g");
+		this._dotLayer = this._selection.append("g");
+		
 		/**
 		 * The segments of the chart.
 		 * @member {d3.selection} Segments#segSelection
 		 */
-		this.segSelection = [];
+		this.segSelection = null;
 		/**
 		 * The dots of the chart.
 		 * @member {d3.selection} Segments#dotSelection
 		 */
-		this.dotSelection = [];
+		this.dotSelection = null;
 		/**
 		 * The ranges of the chart.
 		 * @member {d3.selection} Segments#rangeSelection
 		 */
-		this.rangeSelection = [];
+		this.rangeSelection = null;
 		
 		/**
 		 * A path generator for the segments.
@@ -161,6 +165,12 @@ class Segments extends Chart {
 	setSegments(dataset, attributes, onEvents) {
 		let thisChart = this;
 		
+		//Adjusting the yScale and axis
+		let datasetExtent = dataset.map(d=>d3.extent(d));
+		datasetExtent.push(this.yScale.domain());
+		let newDomain = [d3.min(datasetExtent.map(d=>d[0])), d3.max(datasetExtent.map(d=>d[1]))];
+		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, newDomain);
+		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("seg" + i));
@@ -168,11 +178,21 @@ class Segments extends Chart {
 		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.segPathGenerator(d)));
 		Chart.addIfNull(attributes, "stroke", "black");
 		
-		this.segSelection = this._selection.selectAll(".segment").data(dataset).enter().append("path")
+		this.segSelection = this._segLayer.selectAll(".segment").data(dataset).enter().append("path")
 			.attr("fill", "transparent");
+		
+		//Updating previous selections
+		if (this.dotSelection) {
+			this.dotSelection
+				.attr("cx", (d, i)=>thisChart.xScale(i))
+				.attr("cy", (d, i)=>thisChart.yScale(d));
+		}
+		if (this.rangeSelection) this.rangeSelection.attr("d", (d, i)=>(thisChart.rangePathGenerator(d)));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this.segSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -184,6 +204,12 @@ class Segments extends Chart {
 	setDots(dataset, attributes, onEvents) {
 		let thisChart = this;
 		
+		//Adjusting the yScale and axis
+		let datasetExtent = dataset.map(d=>d3.extent(d));
+		datasetExtent.push(this.yScale.domain());
+		let newDomain = [d3.min(datasetExtent.map(d=>d[0])), d3.max(datasetExtent.map(d=>d[1]))];
+		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, newDomain);
+		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("dotGroup" + i));
@@ -193,17 +219,23 @@ class Segments extends Chart {
 		Chart.addIfNull(attributes, "cy", (d, i)=>thisChart.yScale(d));
 		
 		//Creating the groups
-		this.dotSelection = this._selection.selectAll(".dotGroup").data(dataset).enter().append("g")
+		this.dotSelection = this._dotLayer.selectAll(".dotGroup").data(dataset).enter().append("g")
 			.attr("id", attributes["id"])
 			.attr("class", attributes["class"])
 			.attr("fill", (d, i)=>(thisChart.dotColorScale(i % thisChart.dotColorScale.domain().length)))
 			.selectAll(".groupDot").data(d=>d).enter().append("circle");
+		
+		//Updating previous selections
+		if (this.segSelection) this.segSelection.attr("d", (d, i)=>(thisChart.segPathGenerator(d)));
+		if (this.rangeSelection) this.rangeSelection.attr("d", (d, i)=>(thisChart.rangePathGenerator(d)));
 		
 		attributes["id"] = (d, i)=>("dot_" + thisChart.xAxisNames[i]);
 		attributes["class"] = "groupDot";
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this.dotSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -217,17 +249,33 @@ class Segments extends Chart {
 	setRanges(dataset, attributes, onEvents) {		
 		let thisChart = this;
 		
+		//Adjusting the yScale and axis
+		let datasetExtent = dataset.map(d=>[d3.min(d.map(d=>d[0])), d3.max(d.map(d=>d[1]))]);
+		datasetExtent.push(this.yScale.domain());
+		let newDomain = [d3.min(datasetExtent.map(d=>d[0])), d3.max(datasetExtent.map(d=>d[1]))];
+		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, newDomain);
+		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("range" + i));
 		attributes["class"] = "range";
 		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.rangePathGenerator(d)));
 		
-		this.rangeSelection = this._selection.selectAll(".range").data(dataset).enter().append("path")
+		this.rangeSelection = this._rangeLayer.selectAll(".range").data(dataset).enter().append("path")
 			.attr("fill", (d, i)=>(thisChart.rangeColorScale(i % thisChart.rangeColorScale.domain().length)));
+		
+		//Updating previous selections
+		if (this.dotSelection) {
+			this.dotSelection
+				.attr("cx", (d, i)=>thisChart.xScale(i))
+				.attr("cy", (d, i)=>thisChart.yScale(d));
+		}
+		if (this.segSelection) this.segSelection.attr("d", (d, i)=>(thisChart.segPathGenerator(d)));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this.rangeSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -244,5 +292,25 @@ class Segments extends Chart {
 	 */
 	setRangeColorScale(newColors) {
 		this.rangeColorScale.range(newColors);
+	}
+	
+	/** 
+	 * Clears the chart, removing all plottings.
+	 * @returns {Scatterplot} This chart.
+	 */
+	clear() {
+		if (this.dotSelection) {
+			this.dotSelection.remove();
+			this.dotSelection = null;
+		}
+		if (this.segSelection) {
+			this.segSelection.remove();
+			this.segSelection = null;
+		}
+		if (this.rangeSelection) {
+			this.rangeSelection.remove();
+			this.rangeSelection = null;
+		}
+		return super.clear();
 	}
 }
