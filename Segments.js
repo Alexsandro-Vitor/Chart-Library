@@ -72,6 +72,14 @@ class Segments extends Chart {
 	}
 	
 	/**
+	 * Returns the X scale of the chart.
+	 * @returns {d3.scale} The X scale of this chart.
+	 */
+	xScale() {
+		return this._xScale;
+	}
+	
+	/**
 	 * The X scale of the axis. If scale is given, sets it and also sets the X axis, otherwise returns the current xAxisScale.
 	 * @param {d3.scale} scale - The new xAxisScale.
 	 * @returns {(Segments|d3.scale)} This object or the current xAxisScale.
@@ -79,7 +87,7 @@ class Segments extends Chart {
 	xAxisScale(scale) {
 		if (scale) {
 			this._xAxisScale = scale;
-			this._xScale.domain([0, this._xAxisScale.domain().length-1]);
+			this._xScale.domain([0, scale.domain().length-1]);
 			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup, this._xAxisScale.domain());
 			return this;
 		} else {
