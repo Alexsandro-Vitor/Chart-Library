@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Scatterplot</title>
+    <title>JSDoc: Class: Pie</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Scatterplot</h1>
+    <h1 class="page-title">Class: Pie</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Scatterplot<span class="signature">(container, id, position, margins, dimensions)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Pie<span class="signature">(container, id, position, margins, dimensions)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">Class that represents a Scatterplot.</div>
+            <div class="class-description">Class that represents a Pie chart.</div>
         
     
 </header>
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="Scatterplot"><span class="type-signature"></span>new Scatterplot<span class="signature">(container, id, position, margins, dimensions)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Pie"><span class="type-signature"></span>new Pie<span class="signature">(container, id, position, margins, dimensions)</span><span class="type-signature"></span></h4>
     
 
     
@@ -499,7 +499,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line927">line 927</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1093">line 1093</a>
     </li></ul></dd>
     
 
@@ -564,7 +564,7 @@
     
 
     
-    <h4 class="name" id="clear"><span class="type-signature"></span>clear<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Scatterplot.html">Scatterplot</a>}</span></h4>
+    <h4 class="name" id="clear"><span class="type-signature"></span>clear<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>}</span></h4>
     
 
     
@@ -621,7 +621,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1080">line 1080</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1258">line 1258</a>
     </li></ul></dd>
     
 
@@ -659,7 +659,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="Scatterplot.html">Scatterplot</a></span>
+<span class="param-type"><a href="Pie.html">Pie</a></span>
 
 
     </dd>
@@ -685,7 +685,7 @@
 
 
 <div class="description">
-    The color scale of the scatterplot. Used to set the colors of each dot. If scale is given, sets it, otherwise returns the current colorScale.
+    The color scale of the pie chart. Used to set the colors of each slice. If scale is given, sets it, otherwise returns the current colorScale.
 </div>
 
 
@@ -778,7 +778,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1031">line 1031</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1176">line 1176</a>
     </li></ul></dd>
     
 
@@ -950,7 +950,7 @@
     
 
     
-    <h4 class="name" id="dotSelection"><span class="type-signature"></span>dotSelection<span class="signature">()</span><span class="type-signature"> &rarr; {d3.selection}</span></h4>
+    <h4 class="name" id="genSlice"><span class="type-signature"></span>genSlice<span class="signature">(d, i)</span><span class="type-signature"> &rarr; {d3.arc}</span></h4>
     
 
     
@@ -958,7 +958,7 @@
 
 
 <div class="description">
-    Returns the selection of the dots of the chart.
+    Generates slices from an array with the Array.prototype.map() function. Also uses values from innerRadius and outerRadius.
 </div>
 
 
@@ -967,6 +967,78 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A value in the array.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>i</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An index in the array.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -1002,7 +1074,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1022">line 1022</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1246">line 1246</a>
     </li></ul></dd>
     
 
@@ -1029,7 +1101,7 @@
 
         
 <div class="param-desc">
-    The dots of this chart.
+    Arc made with the value of the array.
 </div>
 
 
@@ -1040,7 +1112,7 @@
     </dt>
     <dd>
         
-<span class="param-type">d3.selection</span>
+<span class="param-type">d3.arc</span>
 
 
     </dd>
@@ -1336,6 +1408,274 @@
     
 
     
+    <h4 class="name" id="innerRadius"><span class="type-signature"></span>innerRadius<span class="signature">(func)</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>|function}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Function which sets the inner radius of the slice based on its value. If func is given, sets it, otherwise returns the current innerRadius.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>func</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new innerRadius.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1148">line 1148</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    This object or the current innerRadius.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Pie.html">Pie</a></span>
+|
+
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="labelSelection"><span class="type-signature"></span>labelSelection<span class="signature">()</span><span class="type-signature"> &rarr; {d3.selection}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns the selection of the labels of each slice.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1139">line 1139</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The labels of the slices.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">d3.selection</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="labelTable"><span class="type-signature"></span>labelTable<span class="signature">(table)</span><span class="type-signature"> &rarr; {<a href="Chart.html">Chart</a>|<a href="LabelTable.html">LabelTable</a>}</span></h4>
     
 
@@ -1614,6 +1954,166 @@
     
 
     
+    <h4 class="name" id="outerRadius"><span class="type-signature"></span>outerRadius<span class="signature">(func)</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>|function}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Function which sets the outer radius of the slice based on its value. If func is given, sets it, otherwise returns the current outerRadius.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>func</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new outerRadius.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1162">line 1162</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    This object or the current outerRadius.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Pie.html">Pie</a></span>
+|
+
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="position"><span class="type-signature"></span>position<span class="signature">()</span><span class="type-signature"> &rarr; {Array.&lt;number>}</span></h4>
     
 
@@ -1840,7 +2340,7 @@
     
 
     
-    <h4 class="name" id="setData"><span class="type-signature"></span>setData<span class="signature">(dataset, attributes, onEvents)</span><span class="type-signature"> &rarr; {<a href="Scatterplot.html">Scatterplot</a>}</span></h4>
+    <h4 class="name" id="setData"><span class="type-signature"></span>setData<span class="signature">(dataset, attributes, onEvents)</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>}</span></h4>
     
 
     
@@ -1848,7 +2348,7 @@
 
 
 <div class="description">
-    Inserts data on the scatterplot and plots it.
+    Inserts data on the pie and plots it.
 </div>
 
 
@@ -1900,7 +2400,7 @@
 
             
 
-            <td class="description last">An array of values for the dots.</td>
+            <td class="description last">An array of values for the slices.</td>
         </tr>
 
     
@@ -1923,7 +2423,7 @@
 
             
 
-            <td class="description last">An object containing functions or constants for attributes of the dots.</td>
+            <td class="description last">An object containing functions or constants for attributes of the slices.</td>
         </tr>
 
     
@@ -1987,7 +2487,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1047">line 1047</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1192">line 1192</a>
     </li></ul></dd>
     
 
@@ -2025,7 +2525,318 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="Scatterplot.html">Scatterplot</a></span>
+<span class="param-type"><a href="Pie.html">Pie</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setSliceLabels"><span class="type-signature"></span>setSliceLabels<span class="signature">(labels, attributes, onEvents)</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Sets the labels of the slices.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>labels</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An array of values for the labels.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>attributes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An object containing functions or constants for attributes of the labels.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onEvents</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An object containing functions for events.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1219">line 1219</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    This chart.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Pie.html">Pie</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="sliceSelection"><span class="type-signature"></span>sliceSelection<span class="signature">()</span><span class="type-signature"> &rarr; {d3.selection}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns the selection of the slices of the chart.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1131">line 1131</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The slices of this chart.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">d3.selection</span>
 
 
     </dd>
@@ -2139,326 +2950,6 @@
     <dd>
         
 <span class="param-type">number</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="xScale"><span class="type-signature"></span>xScale<span class="signature">(scale)</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>|d3.scale}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    The X scale of the chart. If scale is given, sets it and also sets the X axes, otherwise returns the current xScale.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>scale</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">d3.scale</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The new xScale.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line991">line 991</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    This object or the current xScale.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Pie.html">Pie</a></span>
-|
-
-<span class="param-type">d3.scale</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="yScale"><span class="type-signature"></span>yScale<span class="signature">(scale)</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>|d3.scale}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    The Y scale of the chart. If scale is given, sets it and also sets the Y axes, otherwise returns the current yScale.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>scale</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">d3.scale</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The new yScale.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1007">line 1007</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    This object or the current yScale.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Pie.html">Pie</a></span>
-|
-
-<span class="param-type">d3.scale</span>
 
 
     </dd>

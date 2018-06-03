@@ -48,73 +48,125 @@
 	 * @param {string} tagClass - The type of chart.
 	 */
 	constructor(container, id, position, margins, dimensions, tagClass) {
-		/**
-		 * The tag in which the chart will be inserted.
-		 * @member {d3.selection} Chart#container
-		 */
-		this.container = container;
+		this._container = container;
 		
-		/**
-		 * The id of the chart tag.
-		 * @member {string} Chart#id
-		 */
-		this.id = id;
+		this._id = id;
 		
-		/**
-		 * The X coordinate of the chart.
-		 * @member {number} Chart#x
-		 */
-		/**
-		 * The Y coordinate of the chart.
-		 * @member {number} Chart#y
-		 */
 		if ((position == null) || (typeof(position) != "object")) {
-			this.x = 0;
-			this.y = 0;
+			this._x = 0;
+			this._y = 0;
 		} else {
-			this.x = position.x;
-			this.y = position.y;
+			this._x = position.x;
+			this._y = position.y;
 		}
 		
-		/**
-		 * The margins of the chart.
-		 * @member {Object} Chart#margins
-		 */
 		if (margins == null) {
-			this.margins = {left:10, right:10, top:10, bottom:10};
+			this._margins = {left:10, right:10, top:10, bottom:10};
 		} else if (typeof(margins) == "number") {
-			this.margins = {left:margins, right:margins, top:margins, bottom:margins};
+			this._margins = {left:margins, right:margins, top:margins, bottom:margins};
 		} else {
-			this.margins = margins;
+			this._margins = margins;
 		}
-		this.margins.left += this.x;
-		this.margins.top += this.y;
 		
-		/**
-		 * The inside width of the margin.
-		 * @member {number} Chart#width
-		 */
-		/**
-		 * The inside height of the margin.
-		 * @member {number} Chart#height
-		 */
 		if (dimensions == null) {
-			this.width = container.attr("width") - this.margins.left - this.margins.right + this.x;
-			this.height = container.attr("height") - this.margins.top - this.margins.bottom + this.y;
+			this._width = container.attr("width") - this._margins.left - this._margins.right;
+			this._height = container.attr("height") - this._margins.top - this._margins.bottom;
 		} else {
-			this.width = dimensions.width - this.margins.left - this.margins.right;
-			this.height = dimensions.height - this.margins.top - this.margins.bottom;
+			this._width = dimensions.width - this._margins.left - this._margins.right;
+			this._height = dimensions.height - this._margins.top - this._margins.bottom;
 		}
 		
-		/**
-		 * The selection of the chart.
-		 * @member {d3.selection} Chart#tag
-		 * @default d3.selectAll("." + tagClass).select("#" + this.id)
-		 */
-		this.tag = this.container.append("g")
-			.attr("id", this.id)
+		this._selection = this._container.append("g")
+			.attr("id", this._id)
 			.attr("class", tagClass)
-			.attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
+			.attr("transform", "translate(" + (this._margins.left + this._x) + "," + (this._margins.top + this._y) + ")");
+	}
+	
+	/**
+	 * Returns a selection of the tag containing this chart.
+	 * @returns {d3.selection} The container of this chart.
+	 */
+	container() {
+		return this._container;
+	}
+	
+	/**
+	 * If a value is given, sets the id, otherwise returns this chart's id.
+	 * @param {string} id - The new id of the chart.
+	 * @returns {(Chart|string)} This object or the current id.
+	 */
+	id(id) {
+		if (id) {
+			this._id = id;
+			this._selection.attr("id", id);
+			return this;
+		} else {
+			return this._id;
+		}
+	}
+	
+	/**
+	 * Returns the coordinates of the origin of the chart.
+	 * @returns {number[]} The chart's coordinates.
+	 */
+	position() {
+		return [this._x, this._y];
+	}
+	
+	/**
+	 * Returns the margins of the chart.
+	 * @returns {Object} The margins of the chart.
+	 */
+	margins() {
+		return this._margins;
+	}
+		
+	/**
+	 * The inside width of the margin.
+	 * @returns {number} The width of the chart.
+	 */
+	width() {
+		return this._width;
+	}
+	
+	/**
+	 * The inside height of the margin.
+	 * @returns {number} The height of the chart.
+	 */
+	height() {
+		return this._height;
+	}
+	
+	/**
+	 * Returns the selection of the tag of the chart.
+	 * @returns {d3.selection} The selection of this chart.
+	 */
+	selection() {
+		return this._selection;
+	}
+	
+	/**
+	 * The label table of the chart. If table is given, sets the label table. If no value is given, returns the current label table.
+	 * @param {LabelTable} table - The new label table.
+	 * @returns {(Chart|LabelTable)} The new label table.
+	 */
+	labelTable(table) {
+		if (table !== undefined) {
+			this._labelTable = table;
+		}
+		return this._labelTable;
+	}
+	
+	/** 
+	 * Clears the chart, removing the label table.
+	 * @returns {Chart} This chart.
+	 */
+	clear() {
+		if (this._labelTable) {
+			this._labelTable.selection().remove();
+			this._labelTable = null;
+		}
+		return this;
 	}
 	
 	/** 
@@ -125,9 +177,9 @@
 	 * @returns {number[]} Array with equally distanced values.
 	 */
 	static genSequence(start, size, end) {
-		var output = [];
+		let output = [];
 		size--;
-		for (var i = 0; i &lt;= size; i++) {
+		for (let i = 0; i &lt;= size; i++) {
 			output.push(start + i * (end - start) / size);
 		}
 		return output;
@@ -138,11 +190,10 @@
 	 * @param {d3.scale} scale - The scale to be adjusted.
 	 * @param {d3.axis} axis - The axis which uses the scale.
 	 * @param {d3.selection} axisGroup - The group in which the axis is.
-	 * @param {number} minValue - The minimum value of the new domain.
-	 * @param {number} maxValue - The maximum value of the new domain.
+	 * @param {number[]} domain - The new domain of the scale.
 	 */
-	static adjustScaleDomain(scale, axis, axisGroup, minValue, maxValue) {
-		scale.domain([minValue, maxValue]);
+	static adjustScaleDomain(scale, axis, axisGroup, domain) {
+		scale.domain(domain);
 		axis.scale(scale);
 		axisGroup.call(axis);
 	}
@@ -165,12 +216,12 @@
 	 */
 	static insertAttributesEvents(selection, attributes, onEvents) {
 		//Setting attributes
-		for (var attrName in attributes) {
+		for (let attrName in attributes) {
 			selection.attr(attrName, attributes[attrName]);
 		}
 		
 		//Setting events
-		for (var eventName in onEvents) {
+		for (let eventName in onEvents) {
 			selection.on(eventName, onEvents[eventName]);
 		}
 	}
@@ -198,100 +249,98 @@ class Histogram extends Chart {
 	 * @param {number} dimensions.height - The height of the chart, counting the margins.
 	 */
 	constructor(container, id, position, margins, dimensions) {
-		super(container, id, position, margins, dimensions, "histogram");
+		super(container, id, position, margins, dimensions, "histogramChart");
 		
-		/**
-		 * The X scale of the histogram. Used by the columns.
-		 * @member {d3.scale} Histogram#xScale
-		 * @default d3.scaleLinear()
-		 */
-		this.xScale = d3.scaleLinear();
+		this._xScale = d3.scaleLinear();
 		
-		/**
-		 * The X scale of the histogram. Used by the axis.
-		 * @member {d3.scale} Histogram#xAxisScale
-		 * @default d3.scaleOrdinal().range([0, this.width])
-		 */
-		this.xAxisScale = d3.scaleOrdinal()
-			.range([0, this.width]);
-		/**
-		 * The X axis of the histogram.
-		 * @member {d3.axis} Histogram#xAxis
-		 * @default d3.axisBottom(this.xAxisScale)
-		 */
-		this.xAxis = d3.axisBottom(this.xAxisScale);
-		/**
-		 * The group of the X axis.
-		 * @member {d3.selection} Histogram#xAxisGroup
-		 */
-		this.xAxisGroup = this.tag
+		this._xAxisScale = d3.scaleOrdinal()
+			.range([0, this._width]);
+		this._xAxis = d3.axisBottom(this._xAxisScale);
+		this._xAxisGroup = this._selection
 			.append("g")
 			.attr("class", "xAxis")
-			.attr("transform", "translate(0," + this.height  + ")");
-		this.xAxisGroup.call(this.xAxis);
+			.attr("transform", "translate(0," + this._height  + ")");
+		this._xAxisGroup.call(this._xAxis);
 		
-		/**
-		 * The Y scale of the histogram. Used by the axis and the columns.
-		 * @member {d3.scale} Histogram#yScale
-		 * @default d3.scaleLinear().range([this.height, 0])
-		 */
-		this.yScale = d3.scaleLinear()
-			.range([this.height, 0]);
-		/**
-		 * The Y axis of the histogram.
-		 * @member {d3.axis} Histogram#yAxis
-		 * @default d3.axisLeft(this.yScale)
-		 */
-		this.yAxis = d3.axisLeft(this.yScale);
-		/**
-		 * The group of the Y axis.
-		 * @member {d3.selection} Histogram#yAxisGroup
-		 */
-		this.yAxisGroup = this.tag
+		this._yScale = d3.scaleLinear()
+			.range([this._height, 0]);
+		this._yAxis = d3.axisLeft(this._yScale);
+		this._yAxisGroup = this._selection
 			.append("g")
 			.attr("class", "yAxis");
-		this.yAxisGroup.call(this.yAxis);
+		this._yAxisGroup.call(this._yAxis);
 		
-		/**
-		 * The names of the columns.
-		 * @member {string[]} Histogram#xAxisNames
-		 */
-		this.xAxisNames = [];
+		this._colSelection = null;
 		
-		/**
-		 * The columns of the histogram.
-		 * @member {d3.selection} Histogram#colSelection
-		 */
-		this.colSelection = null;
-		
-		/**
-		 * The color scale of the histogram. Used to set the colors of each column in the histogram.
-		 * @member {d3.scale} Histogram#colorScale
-		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1)).range(d3.schemeCategory10)
-		 */
-		this.colorScale = d3.scaleLinear()
+		this._colorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
 			.range(d3.schemeCategory10);
 	}
 	
-	/** 
-	 * Sets the names of the columns of the histogram and modify the axis.
-	 * @param {string[]} newDomain - An array of names for the columns.
+	/**
+	 * Returns the X scale of the chart.
+	 * @returns {d3.scale} The X scale of this chart.
 	 */
-	setXDomain(newDomain) {
-		this.xAxisNames = newDomain.slice();
-		newDomain.push("");
-		newDomain.unshift("");
-		var sequence = Chart.genSequence(0, newDomain.length, this.width);
-		this.xAxisScale
-			.domain(newDomain)
-			.range(sequence);
-		this.xAxis.scale(this.xAxisScale);
-		this.xAxisGroup.call(this.xAxis);
-		
-		this.xScale
-			.domain([0, this.xAxisNames.length-1])
-			.range([sequence[1], sequence[this.xAxisNames.length]]);
+	xScale() {
+		return this._xScale;
+	}
+	
+	/**
+	 * The X scale of the axis. If scale is given, sets it and also sets the X axis, otherwise returns the current xAxisScale.
+	 * @param {d3.scale} scale - The new xAxisScale.
+	 * @returns {(Segments|d3.scale)} This object or the current xAxisScale.
+	 */
+	xAxisScale(scale) {
+		if (scale) {
+			this._xAxisScale = scale;
+			this._xScale
+				.domain([0, scale.domain().length - 3])
+				.range([scale.range()[1], scale.range()[scale.domain().length - 2]]);
+			console.log(this._xScale.range());
+			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup, this._xAxisScale.domain());
+			return this;
+		} else {
+			return this._xAxisScale;
+		}
+	}
+	
+	/**
+	 * The Y scale of the chart. If scale is given, sets it and also sets the Y axis, otherwise returns the current yScale.
+	 * @param {d3.scale} scale - The new yScale.
+	 * @returns {(Segments|d3.scale)} This object or the current yScale.
+	 */
+	yScale(scale) {
+		if (scale) {
+			this._yScale = scale;
+			Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, d3.extent(this._yScale.domain()));
+			return this;
+		} else {
+			return this._yScale;
+		}
+	}
+	
+	/**
+	 * Returns the selection of the columns of the chart.
+	 * @returns {d3.selection} The columns of this chart.
+	 */
+	colSelection() {
+		return this._colSelection;
+	}
+	
+	/**
+	 * The color scale of the histogram. Used to set the colors of each column in the histogram. If scale is given, sets it and also changes the current column colors, otherwise returns the current colorScale.
+	 * @param {d3.scale} scale - The new colorScale.
+	 * @returns {(Pie|d3.scale)} This object or the current colorScale.
+	 */
+	colorScale(scale) {
+		if (scale) {
+			this._colorScale = scale;
+			let thisChart = this;
+			if (this._colSelection != null) this._colSelection.attr("fill", (d, i)=>(thisChart._colorScale(i % scale.range().length)));
+			return this;
+		} else {
+			return this._colorScale;
+		}
 	}
 	
 	/** 
@@ -299,42 +348,44 @@ class Histogram extends Chart {
 	 * @param {number[]} dataset - An array of values for the columns.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the columns.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Histogram} This chart.
 	 */
 	setData(dataset, attributes, onEvents) {
-		var colWidth = this.width / (this.xAxisNames.length + 1);
-		var thisChart = this;
-		if (attributes == null) attributes = [];
+		let colWidth = this._width / (this._xAxisScale.domain().length - 1);
+		let thisChart = this;
 		
 		//Adjusting the yScale and axis
-		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, 0, d3.max(dataset));
+		Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, [0, d3.max(dataset)]);
 		
 		//Mandatory attributes
-		Chart.addIfNull(attributes, "id", (d, i)=>("col" + thisChart.xAxisNames[i]));
+		if (attributes == null) attributes = [];
+		Chart.addIfNull(attributes, "id", (d, i)=>("col" + thisChart._xAxisScale.domain()[i+1]));
 		attributes["class"] = "column";
-		Chart.addIfNull(attributes, "x", (d, i)=>(thisChart.xScale(i) - colWidth/2));
-		Chart.addIfNull(attributes, "y", (d, i)=>(thisChart.yScale(d)));
+		Chart.addIfNull(attributes, "x", (d, i)=>(thisChart._xScale(i) - colWidth/2));
+		Chart.addIfNull(attributes, "y", (d, i)=>(thisChart._yScale(d)));
 		Chart.addIfNull(attributes, "width", colWidth);
-		Chart.addIfNull(attributes, "height", (d, i)=>(thisChart.height - thisChart.yScale(d)));
+		Chart.addIfNull(attributes, "height", (d, i)=>(thisChart._height - thisChart._yScale(d)));
 		
 		//Column selection and color setting
-		this.colSelection = this.tag.selectAll(".column").data(dataset).enter().append("rect")
-			.attr("fill", (d, i)=>(thisChart.colorScale(i % thisChart.colorScale.domain().length)));
+		this._colSelection = this._selection.selectAll(".column").data(dataset).enter().append("rect")
+			.attr("fill", (d, i)=>(thisChart._colorScale(i % thisChart._colorScale.domain().length)));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.colSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._colSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
-	 * Sets the new colors of the chart. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function.
-	 * @param {string[]} newColors - An array of colors for the colorScale to work with.
+	 * Clears the chart, removing all plottings.
+	 * @returns {Histogram} This chart.
 	 */
-	setColorScale(newColors) {
-		var sequence = Chart.genSequence(0, newColors.length, newColors.length-1);
-		this.colorScale
-			.domain(sequence)
-			.range(newColors);
-		var thisChart = this;
-		if (this.colSelection != null) this.colSelection.attr("fill", (d, i)=>(thisChart.colorScale(i % newColors.length)));
+	clear() {
+		if (this._colSelection) {
+			this._colSelection.remove();
+			this._colSelection = null;
+		}
+		return super.clear();
 	}
 }
 
@@ -362,115 +413,172 @@ class Segments extends Chart {
 	constructor(container, id, position, margins, dimensions) {
 		super(container, id, position, margins, dimensions, "segmentsChart");
 		
-		/**
-		 * The X scale of the chart. Used by the segments.
-		 * @member {d3.scale} Segments#xScale
-		 * @default d3.scaleLinear()
-		 */
-		this.xScale = d3.scaleLinear();
+		this._xScale = d3.scaleLinear()
+			.range([0, this._width]);
 		
-		/**
-		 * The X scale of the chart. Used by the axis.
-		 * @member {d3.scale} Segments#xAxisScale
-		 * @default d3.scaleOrdinal().range([0, this.width])
-		 */
-		this.xAxisScale = d3.scaleOrdinal()
-			.range([0, this.width]);
-		/**
-		 * The X axis of the chart.
-		 * @member {d3.axis} Segments#xAxis
-		 * @default d3.axisBottom(this.xAxisScale)
-		 */
-		this.xAxis = d3.axisBottom(this.xAxisScale);
-		/**
-		 * The group of the X axis.
-		 * @member {d3.selection} Segments#xAxisGroup
-		 */
-		this.xAxisGroup = this.tag
+		this._xAxisScale = d3.scaleOrdinal()
+			.range([0, this._width]);
+		this._xAxis = d3.axisBottom(this._xAxisScale);
+		this._xAxisGroup = this._selection
 			.append("g")
 			.attr("class", "xAxis")
-			.attr("transform", "translate(0," + this.height  + ")");
-		this.xAxisGroup.call(this.xAxis);
+			.attr("transform", "translate(0," + this._height  + ")");
+		this._xAxisGroup.call(this._xAxis);
 		
-		/**
-		 * The Y scale of the chart. Used by the axis and the columns.
-		 * @member {d3.scale} Segments#yScale
-		 * @default d3.scaleLinear().range([this.height, 0])
-		 */
-		this.yScale = d3.scaleLinear()
-			.range([this.height, 0]);
-		/**
-		 * The Y axis of the chart.
-		 * @member {d3.axis} Segments#yAxis
-		 * @default d3.axisLeft(this.yScale)
-		 */
-		this.yAxis = d3.axisLeft(this.yScale);
-		/**
-		 * The group of the Y axis.
-		 * @member {d3.selection} Segments#yAxisGroup
-		 */
-		this.yAxisGroup = this.tag
+		this._yScale = d3.scaleLinear()
+			.range([this._height, 0]);
+		this._yAxis = d3.axisLeft(this._yScale);
+		this._yAxisGroup = this._selection
 			.append("g")
 			.attr("class","yAxis");
-		this.yAxisGroup.call(this.yAxis);
+		this._yAxisGroup.call(this._yAxis);
 		
-		/**
-		 * The names in the X axis.
-		 * @member {string[]} Segments#xAxisNames
-		 */
-		this.xAxisNames = [];
+		//Layers to make sure the ranges stay behind the segments and the segments stay behind the dots
+		this._rangeLayer = this._selection.append("g");
+		this._segLayer = this._selection.append("g");
+		this._dotLayer = this._selection.append("g");
 		
-		/**
-		 * The segments of the chart.
-		 * @member {d3.selection} Segments#segSelection
-		 */
-		this.segSelection = [];
-		/**
-		 * The dots of the chart.
-		 * @member {d3.selection} Segments#dotSelection
-		 */
-		this.dotSelection = [];
-		/**
-		 * The ranges of the chart.
-		 * @member {d3.selection} Segments#rangeSelection
-		 */
-		this.rangeSelection = [];
+		this._segSelection = null;
 		
-		/**
-		 * The color scale for dots on the chart. Used to set the colors of each dotGroup in the chart.
-		 * @member {d3.scale} Segments#dotColorScale
-		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeSet1.length, d3.schemeSet1.length - 1)).range(d3.schemeSet1)
-		 */
-		this.dotColorScale = d3.scaleLinear()
+		this._dotSelection = null;
+		
+		this._rangeSelection = null;
+		
+		this.segPathGenerator = d3.line()
+			.x((d, i)=>this._xScale(i))
+			.y((d, i)=>this._yScale(d));
+		
+		this.rangePathGenerator = d3.area()
+			.x((d, i)=>this._xScale(i))
+			.y0((d, i)=>this._yScale(d[0]))
+			.y1((d, i)=>this._yScale(d[1]));
+		
+		this._dotColorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeSet1.length, d3.schemeSet1.length - 1))
 			.range(d3.schemeSet1);
 		
-		/**
-		 * The color scale for ranges on the chart. Used to set the colors of each scale in the chart.
-		 * @member {d3.scale} Segments#rangeColorScale
-		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeSet2.length, d3.schemeSet2.length - 1)).range(d3.schemeSet2)
-		 */
-		this.rangeColorScale = d3.scaleLinear()
+		this._rangeColorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeSet2.length, d3.schemeSet2.length - 1))
 			.range(d3.schemeSet2);
 	}
 	
-	/** 
-	 * Sets the names the X axis.
-	 * @param {string[]} newDomain - An array of names for the X axis.
+	/**
+	 * Returns the X scale of the chart.
+	 * @returns {d3.scale} The X scale of this chart.
 	 */
-	setXDomain(newDomain) {
-		this.xAxisNames = newDomain.slice();
-		var sequence = Chart.genSequence(0, newDomain.length, this.width);
-		this.xAxisScale
-			.domain(newDomain)
-			.range(sequence);
-		this.xAxis.scale(this.xAxisScale);
-		this.xAxisGroup.call(this.xAxis);
-		
-		this.xScale
-			.domain([0, this.xAxisNames.length-1])
-			.range([0, this.width]);
+	xScale() {
+		return this._xScale;
+	}
+	
+	/**
+	 * The X scale of the axis. If scale is given, sets it and also sets the X axis, otherwise returns the current xAxisScale.
+	 * @param {d3.scale} scale - The new xAxisScale.
+	 * @returns {(Segments|d3.scale)} This object or the current xAxisScale.
+	 */
+	xAxisScale(scale) {
+		if (scale) {
+			this._xAxisScale = scale;
+			this._xScale.domain([0, scale.domain().length-1]);
+			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup, this._xAxisScale.domain());
+			return this;
+		} else {
+			return this._xScale;
+		}
+	}
+	
+	/**
+	 * The Y scale of the chart. If scale is given, sets it and also sets the Y axis, otherwise returns the current yScale.
+	 * @param {d3.scale} scale - The new yScale.
+	 * @returns {(Segments|d3.scale)} This object or the current yScale.
+	 */
+	yScale(scale) {
+		if (scale) {
+			this._yScale = scale;
+			Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, d3.extent(this._yScale.domain()));
+			return this;
+		} else {
+			return this._yScale;
+		}
+	}
+	
+	/**
+	 * Returns the selection of the segments of the chart.
+	 * @returns {d3.selection} The segments of this chart.
+	 */
+	segSelection() {
+		return this._segSelection;
+	}
+	
+	/**
+	 * Returns the selection of the dots of the chart.
+	 * @returns {d3.selection} The dots of this chart.
+	 */
+	dotSelection() {
+		return this._dotSelection;
+	}
+	
+	/**
+	 * Returns the selection of the ranges of the chart.
+	 * @returns {d3.selection} The ranges of this chart.
+	 */
+	rangeSelection() {
+		return this._rangeSelection;
+	}
+	
+	/**
+	 * A path generator for the segments. If gen is given, sets it, otherwise returns the current segPathGenerator.
+	 * @param {d3.line} gen - The new segPathGenerator.
+	 * @returns {(Segments|d3.line)} This object or the current segPathGenerator.
+	 */
+	segPathGenerator(gen) {
+		if (gen) {
+			this._segPathGenerator = gen;
+			return this;
+		} else {
+			return this._segPathGenerator;
+		}
+	}
+	
+	/**
+	 * A path generator for the range. If gen is given, sets it, otherwise returns the current rangePathGenerator.
+	 * @param {d3.area} gen - The new rangePathGenerator.
+	 * @returns {(Segments|d3.area)} This object or the current rangePathGenerator.
+	 */
+	rangePathGeneration(gen) {
+		if (gen) {
+			this._rangePathGenerator = gen;
+			return this;
+		} else {
+			return this._rangePathGenerator;
+		}
+	}
+	
+	/**
+	 * The color scale for ranges on the chart. Used to set the colors of each scale in the chart. If scale is given, sets it, otherwise returns the current dotColorScale.
+	 * @param {d3.scale} scale - The new dotColorScale.
+	 * @returns {(Segments|d3.scale)} This object or the current dotColorScale.
+	 */
+	dotColorScale(scale) {
+		if (scale) {
+			this._dotColorScale = scale;
+			return this;
+		} else {
+			return this._dotColorScale;
+		}
+	}
+	
+	/**
+	 * The color scale for ranges on the chart. Used to set the colors of each scale in the chart. If scale is given, sets it, otherwise returns the current rangeColorScale.
+	 * @param {d3.scale} scale - The new rangeColorScale.
+	 * @returns {(Segments|d3.scale)} This object or the current rangeColorScale.
+	 */
+	rangeColorScale(scale) {
+		if (scale) {
+			this._rangeColorScale = scale;
+			return this;
+		} else {
+			return this._rangeColorScale;
+		}
 	}
 	
 	/** 
@@ -478,22 +586,39 @@ class Segments extends Chart {
 	 * @param {number[][]} dataset - An array of arrays for each segment.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the segments.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Segments} This chart.
 	 */
 	setSegments(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
+		
+		//Adjusting the yScale and axis
+		let datasetExtent = dataset.map(d=>d3.extent(d));
+		datasetExtent.push(this._yScale.domain());
+		let newDomain = [d3.min(datasetExtent.map(d=>d[0])), d3.max(datasetExtent.map(d=>d[1]))];
+		Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, newDomain);
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("seg" + i));
 		attributes["class"] = "segment";
-		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genSegPath(d)));
+		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.segPathGenerator(d)));
 		Chart.addIfNull(attributes, "stroke", "black");
 		
-		this.segSelection = this.tag.selectAll(".segment").data(dataset).enter().append("path")
+		this._segSelection = this._segLayer.selectAll(".segment").data(dataset).enter().append("path")
 			.attr("fill", "transparent");
 		
+		//Updating previous selections
+		if (this._dotSelection) {
+			this._dotSelection
+				.attr("cx", (d, i)=>thisChart._xScale(i))
+				.attr("cy", (d, i)=>thisChart._yScale(d));
+		}
+		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(thisChart.rangePathGenerator(d)));
+		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.segSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._segSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -501,104 +626,104 @@ class Segments extends Chart {
 	 * @param {number[][]} dataset - An array of arrays for each dot.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the dots.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Segments} This chart.
 	 */
 	setDots(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
+		
+		//Adjusting the yScale and axis
+		let datasetExtent = dataset.map(d=>d3.extent(d));
+		datasetExtent.push(this._yScale.domain());
+		let newDomain = [d3.min(datasetExtent.map(d=>d[0])), d3.max(datasetExtent.map(d=>d[1]))];
+		Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, newDomain);
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("dotGroup" + i));
 		attributes["class"] = "dotGroup";
 		Chart.addIfNull(attributes, "r", "5px");
-		Chart.addIfNull(attributes, "cx", (d, i)=>thisChart.xScale(i));
-		Chart.addIfNull(attributes, "cy", (d, i)=>thisChart.yScale(d));
+		Chart.addIfNull(attributes, "cx", (d, i)=>thisChart._xScale(i));
+		Chart.addIfNull(attributes, "cy", (d, i)=>thisChart._yScale(d));
 		
 		//Creating the groups
-		this.dotSelection = this.tag.selectAll(".dotGroup").data(dataset).enter().append("g")
+		this._dotSelection = this._dotLayer.selectAll(".dotGroup").data(dataset).enter().append("g")
 			.attr("id", attributes["id"])
 			.attr("class", attributes["class"])
-			.attr("fill", (d, i)=>(thisChart.dotColorScale(i % thisChart.dotColorScale.domain().length)))
+			.attr("fill", (d, i)=>(thisChart._dotColorScale(i % thisChart._dotColorScale.domain().length)))
 			.selectAll(".groupDot").data(d=>d).enter().append("circle");
 		
-		attributes["id"] = (d, i)=>("dot_" + thisChart.xAxisNames[i]);
+		//Updating previous selections
+		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(thisChart.segPathGenerator(d)));
+		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(thisChart.rangePathGenerator(d)));
+		
+		attributes["id"] = (d, i)=>("dot_" + thisChart._xAxisScale.domain()[i]);
 		attributes["class"] = "groupDot";
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.dotSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
 	 * Inserts data on the chart as ranges and plots it.
 	 * @param {number[][][]} dataset - An array of arrays for each range.
 	 * @param {number[][]} dataset[i] - The data used to create one range.
-	 * @param {number[]} dataset[i][0] - The array with the minimum values of the range.
-	 * @param {number[]} dataset[i][1] - The array with the maximum values of the range.
+	 * @param {number[]} dataset[i][a] - Array with the minimum and maximum values (respectively) at index 'a'.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the ranges.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Segments} This chart.
 	 */
 	setRanges(dataset, attributes, onEvents) {		
-		var thisChart = this;
+		let thisChart = this;
+		
+		//Adjusting the yScale and axis
+		let datasetExtent = dataset.map(d=>[d3.min(d.map(d=>d[0])), d3.max(d.map(d=>d[1]))]);
+		datasetExtent.push(this._yScale.domain());
+		let newDomain = [d3.min(datasetExtent.map(d=>d[0])), d3.max(datasetExtent.map(d=>d[1]))];
+		Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, newDomain);
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("range" + i));
 		attributes["class"] = "range";
-		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genRangePath(d[0], d[1])));
+		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.rangePathGenerator(d)));
 		
-		this.rangeSelection = this.tag.selectAll(".range").data(dataset).enter().append("path")
-			.attr("fill", (d, i)=>(thisChart.rangeColorScale(i % thisChart.rangeColorScale.domain().length)));
+		this._rangeSelection = this._rangeLayer.selectAll(".range").data(dataset).enter().append("path")
+			.attr("fill", (d, i)=>(thisChart._rangeColorScale(i % thisChart._rangeColorScale.domain().length)));
+		
+		//Updating previous selections
+		if (this._dotSelection) {
+			this._dotSelection
+				.attr("cx", (d, i)=>thisChart._xScale(i))
+				.attr("cy", (d, i)=>thisChart._yScale(d));
+		}
+		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(thisChart.segPathGenerator(d)));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.rangeSelection, attributes, onEvents);
-	}
-	
-	/**
-	 * Generates a path for a segment.
-	 * @param {number[]} d - The array with the values of the path.
-	 * @returns {string} A value for the "d" field of the path.
-	 */
-	genSegPath(d) {
-		var path = d3.path();
-		path.moveTo(this.xScale(0), this.yScale(d[0]));
-		for (var i = 1; i &lt; d.length; i++) {
-			path.lineTo(this.xScale(i), this.yScale(d[i]));
-		}
-		return path.toString();
-	}
-	
-	/**
-	 * Generates a path for a range.
-	 * @param {number[]} minValues - The array with the minimum values of the range.
-	 * @param {number[]} maxValues - The array with the maximum values of the range.
-	 * @returns {string} A value for the "d" field of the path.
-	 */
-	genRangePath(minValues, maxValues) {
-		var path = d3.path();
-		path.moveTo(this.xScale(0), this.yScale(minValues[0]));
-		for (var i = 1; i &lt; minValues.length; i++) {
-			path.lineTo(this.xScale(i), this.yScale(minValues[i]));
-		}
-		for (var i = maxValues.length-1; i >= 0; i--) {
-			path.lineTo(this.xScale(i), this.yScale(maxValues[i]));
-		}
-		path.closePath();
-		return path.toString();
+		Chart.insertAttributesEvents(this._rangeSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
-	 * Sets the new colors of the dotGroups. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function.
-	 * @param {string[]} newColors - An array of colors for the dotColorScale to work with.
+	 * Clears the chart, removing all plottings.
+	 * @returns {Segments} This chart.
 	 */
-	setDotColorScale(newColors) {
-		this.dotColorScale.range(newColors);
-	}
-	
-	/** 
-	 * Sets the new colors of the chart. The colors need to be set here because you cant have an "fill" field in an array, since it's the name of an array function.
-	 * @param {string[]} newColors - An array of colors for the rangeColorScale to work with.
-	 */
-	setRangeColorScale(newColors) {
-		this.rangeColorScale.range(newColors);
+	clear() {
+		if (this._dotSelection) {
+			this._dotSelection.remove();
+			this._dotSelection = null;
+		}
+		if (this._segSelection) {
+			this._segSelection.remove();
+			this._segSelection = null;
+		}
+		if (this._rangeSelection) {
+			this._rangeSelection.remove();
+			this._rangeSelection = null;
+		}
+		return super.clear();
 	}
 }
 
@@ -626,59 +751,110 @@ class Map extends Chart {
 	constructor(container, id, position, margins, dimensions) {
 		super(container, id, position, margins, dimensions, "mapChart");
 		
-		/**
-		 * The projection of the chart.
-		 * @member {d3.projection} Map#projection
-		 * @default d3.geoMercator()
-		 */
-		this.projection = d3.geoMercator();
+		this._projection = d3.geoMercator();
+		this._geoPath = d3.geoPath().projection(this._projection);
 		
-		/**
-		 * The geoPath of the chart.
-		 * @member {d3.path} Map#geoPath
-		 * @default d3.geoPath().projection(this.projection)
-		 */
-		this.geoPath = d3.geoPath().projection(this.projection);
+		this._fillValue = (d, i)=>1;
 		
-		/**
-		 * The Paths of the chart.
-		 * @member {d3.selection} Map#pathSelection
-		 */
-		this.pathSelection = null;
+		this._colorScale = d3.scalePow();
 		
-		/**
-		 * The scale between input values and the value used at colorScheme. Its range should stay at [0, 1].
-		 * @member {d3.scale} Map#colorScale
-		 * @default d3.scalePow()
-		 */
-		this.colorScale = d3.scalePow();
+		this._colorScheme = d3.interpolateInferno;
 		
-		/**
-		 * The color scheme used at the chart. Uses d3.interpolateInferno by default.
-		 * @member {d3.scale} Map#colorScheme
-		 * @default d3.interpolateInferno
-		 */
-		this.colorScheme = d3.interpolateInferno;
+		this._fillFunction = (d, i)=>this._colorScheme(this._colorScale(this._fillValue(d, i)));
 		
-		/**
-		 * The function which selects the color of the plots. By default, it uses the fillValue normalized by the colorScale to select a value at the colorScheme.
-		 * @member {function} Map#fillFunction
-		 * @default (d, i)=>this.colorScheme(this.colorScale(this.fillValue(d, i)))
-		 */
-		this.fillFunction = (d, i)=>this.colorScheme(this.colorScale(this.fillValue(d, i)));
+		this._pathSelection = null;
 		
-		/**
-		 * The function which determines the value of the dataset which will be used on the fillFunction. Default function always returns 1.
-		 * @member {function} Map#fillValue
-		 * @default (d, i)=>1
-		 */
-		this.fillValue = (d, i)=>1;
-		
-		/**
-		 * The dots plotted in the chart.
-		 * @member {d3.selection} Map#dotSelection
-		 */
-		this.dotSelection = null;
+		this._dotSelection = null;
+	}
+	
+	/**
+	 * Returns the selection of the paths of the chart.
+	 * @returns {d3.selection} The paths of this chart.
+	 */
+	pathSelection() {
+		return this._pathSelection;
+	}
+	
+	/**
+	 * Returns the selection of the dots of the chart.
+	 * @returns {d3.selection} The dots of this chart.
+	 */
+	dotSelection() {
+		return this._dotSelection;
+	}
+	
+	/**
+	 * If a projection is given, sets the projection of the map, otherwise returns the current projection.
+	 * @param {Object} projection - The new projection of the map.
+	 * @returns {(Map|d3.projection)} This object or the current projection.
+	 */
+	projection(projection) {
+		if (projection) {
+			this._projection = projection;
+			this._geoPath = d3.geoPath().projection(this._projection);
+			return this;
+		} else {
+			return this._projection;
+		}
+	}
+	
+	/**
+	 * The function which determines the value of the dataset to be used on the fillFunction. Default function always returns 1. If a function is given, sets fillValue, otherwise returns the current fillValue.
+	 * @param {function} func - The new fillValue.
+	 * @returns {(Map|function)} This object or the current fillValue.
+	 */
+	fillValue(func) {
+		if (func) {
+			this._fillValue = func;
+			return this;
+		} else {
+			return this._fillValue;
+		}
+	}
+	
+	/**
+	 * The scale between input values and the value used at colorScheme. Its range should stay at [0, 1]. If a scale is given sets the colorScale, otherwise returns the current colorScale.
+	 * @param {d3.scale} scale - The new colorScale.
+	 * @returns {(Map|d3.projection)} This object or the current colorScale.
+	 */
+	colorScale(scale) {
+		if (scale) {
+			this._colorScale = scale;
+			return this;
+		} else {
+			return this._colorScale;
+		}
+	}
+	
+	/**
+	 * The color scheme used at the chart. Uses d3.interpolateInferno by default. If a scale is given sets the colorScheme, otherwise returns the current colorScheme.
+	 * @param {d3.scale} scheme - The new colorScheme.
+	 * @returns {(Map|d3.scale)} This object or the current colorScheme.
+	 */
+	colorScheme(scheme) {
+		if (scheme) {
+			this._colorScheme = scheme;
+			return this;
+		} else {
+			return this._colorScheme;
+		}
+	}
+	
+	/**
+	 * The function which sets the colors of the map. If a function is given, sets fillFunction. Setting func to null will reset fillFunction to its default value: (d, i)=>this._colorScheme(this._colorScale(this._fillValue(d, i))). Not passing a value makes it return the current fillFunction.
+	 * @param {function} func - The new fillFunction.
+	 * @returns {(Map|function)} This object or the current fillFunction.
+	 */
+	fillFunction(func) {
+		if (func) {
+			this._fillFunction = func;
+			return this;
+		} else if (func === null) {
+			this._fillFunction = (d, i)=>this._colorScheme(this._colorScale(this._fillValue(d, i)));
+			return this;
+		} else {
+			return this._fillFunction;
+		}
 	}
 	
 	/** 
@@ -686,24 +862,27 @@ class Map extends Chart {
 	 * @param {Object} geojson - The data of a geojson file.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the map.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Map} This chart.
 	 */
 	setMap(geojson, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Scales the projection to centralize the map
-		this.projection.fitExtent([[0, 0], [this.width, this.height]], geojson);
+		this._projection.fitExtent([[0, 0], [this._width, this._height]], geojson);
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>d.properties.L1);
 		attributes["class"] = "mapPath";
-		Chart.addIfNull(attributes, "d", (d, i)=>thisChart.geoPath(d.geometry));
+		Chart.addIfNull(attributes, "d", (d, i)=>thisChart._geoPath(d.geometry));
 		
-		this.pathSelection = this.tag.selectAll(".mapPath").data(geojson.features).enter().append("path")
-			.attr("fill", (d, i)=>thisChart.fillFunction(d, i));
+		this._pathSelection = this._selection.selectAll(".mapPath").data(geojson.features).enter().append("path")
+			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.pathSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._pathSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -711,15 +890,18 @@ class Map extends Chart {
 	 * @param {number[][]} dataset - The data to be plotted on the map.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the map.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Map} This chart.
 	 */
 	setData(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
-		this.pathSelection.data(dataset)
-			.attr("fill", (d, i)=>thisChart.fillFunction(d, i));
+		this._pathSelection.data(dataset)
+			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.pathSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._pathSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -727,9 +909,10 @@ class Map extends Chart {
 	 * @param {number[][]} dataset - The data to be plotted on the map.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the map.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Map} This chart.
 	 */
 	setDots(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
@@ -739,29 +922,29 @@ class Map extends Chart {
 		Chart.addIfNull(attributes, "cx", 10);
 		Chart.addIfNull(attributes, "cy", 10);
 		
-		this.dotSelection = this.tag.selectAll(".mapDot").data(dataset).enter().append("circle")
-			.attr("fill", (d, i)=>thisChart.fillFunction(d, i));
+		this._dotSelection = this._selection.selectAll(".mapDot").data(dataset).enter().append("circle")
+			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.dotSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
-	 * Clears the chart, removing all paths and dots.
+	 * Clears the chart, removing all plottings.
+	 * @returns {Map} This chart.
 	 */
 	clear() {
-		if (this.pathSelection) {
-			this.pathSelection.remove();
-			this.pathSelection = null;
+		if (this._pathSelection) {
+			this._pathSelection.remove();
+			this._pathSelection = null;
 		}
-		if (this.dotSelection) {
-			this.dotSelection.remove();
-			this.dotSelection = null;
+		if (this._dotSelection) {
+			this._dotSelection.remove();
+			this._dotSelection = null;
 		}
-		if (this.labels) {
-			this.labels.tag.remove();
-			this.labels = null;
-		}
+		return super.clear();
 	}
 }
 
@@ -789,91 +972,97 @@ class Scatterplot extends Chart {
 	constructor(container, id, position, margins, dimensions) {
 		super(container, id, position, margins, dimensions, "scatteplotChart");
 		
-		/**
-		 * The X scale of the chart.
-		 * @member {d3.scale} Scatterplot#xScale
-		 * @default d3.scaleLinear().range([0, this.width])
-		 */
-		this.xScale = d3.scaleLinear()
-			.range([0, this.width]);
-		/**
-		 * The Y scale of the chart.
-		 * @member {d3.scale} Scatterplot#yScale
-		 * @default d3.scaleLinear().range([this.height, 0])
-		 */
-		this.yScale = d3.scaleLinear()
-			.range([this.height, 0]);
-		/**
-		 * The top X axis of the chart.
-		 * @member {d3.axis} Scatterplot#xAxisTop
-		 * @default d3.axisTop(this.xScale)
-		 */
-		this.xAxisTop = d3.axisTop(this.xScale);
-		/**
-		 * The bottom X axis of the chart.
-		 * @member {d3.axis} Scatterplot#xAxisBottom
-		 * @default d3.axisBottom(this.xScale
-		 */
-		this.xAxisBottom = d3.axisBottom(this.xScale);
-		/**
-		 * The group of the top X axis.
-		 * @member {d3.selection} Scatterplot#xAxisTopGroup
-		 */
-		this.xAxisTopGroup = this.tag
+		this._xScale = d3.scaleLinear()
+			.range([0, this._width]);
+		
+		this._xAxisTop = d3.axisTop(this._xScale);
+		this._xAxisTopGroup = this._selection
 			.append("g")
 			.attr("class", "xAxis");
-		this.xAxisTopGroup.call(this.xAxisTop);
-		/**
-		 * The group of the bottom X axis.
-		 * @member {d3.selection} Scatterplot#xAxisBottomGroup
-		 */
-		this.xAxisBottomGroup = this.tag
+		this._xAxisTopGroup.call(this._xAxisTop);
+		
+		this._xAxisBottom = d3.axisBottom(this._xScale);
+		this._xAxisBottomGroup = this._selection
 			.append("g")
 			.attr("class", "xAxis")
-			.attr("transform", "translate(0, " + this.height + ")");
-		this.xAxisBottomGroup.call(this.xAxisBottom);
-		/**
-		 * The left Y axis of the chart.
-		 * @member {d3.axis} Scatterplot#yAxisLeft
-		 * @default d3.axisLeft(this.yScale)
-		 */
-		this.yAxisLeft = d3.axisLeft(this.yScale);
-		/**
-		 * The right Y axis of the chart.
-		 * @member {d3.axis} Scatterplot#yAxisRight
-		 * @default d3.axisRight(this.yScale)
-		 */
-		this.yAxisRight = d3.axisRight(this.yScale);
-		/**
-		 * The group of the left Y axis.
-		 * @member {d3.selection} Scatterplot#yAxisLeftGroup
-		 */
-		this.yAxisLeftGroup = this.tag
+			.attr("transform", "translate(0, " + this._height + ")");
+		this._xAxisBottomGroup.call(this._xAxisBottom);
+		
+		this._yScale = d3.scaleLinear()
+			.range([this._height, 0]);
+		
+		this._yAxisLeft = d3.axisLeft(this._yScale);
+		this._yAxisLeftGroup = this._selection
 			.append("g")
 			.attr("class", "yAxis")
-		this.yAxisLeftGroup.call(this.yAxisLeft);
-		/**
-		 * The group of the right Y axis.
-		 * @member {d3.selection} Scatterplot#yAxisRightGroup
-		 */
-		this.yAxisRightGroup = this.tag
+		this._yAxisLeftGroup.call(this._yAxisLeft);
+		
+		this._yAxisRight = d3.axisRight(this._yScale);
+		this._yAxisRightGroup = this._selection
 			.append("g")
 			.attr("class", "yAxis")
-			.attr("transform", "translate(" + this.width + ", 0)");
-		this.yAxisRightGroup.call(this.yAxisRight);
-		/**
-		 * The dots of the scatterplot.
-		 * @member {d3.selection} Scatterplot#dotSelection
-		 */
-		this.dotSelection = null;
-		/**
-		 * The color scale of the scatterplot. Used to set the colors of each dot.
-		 * @member {d3.scale} Scatterplot#colorScale
-		 * @default d3.scaleLinear().domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1)).range(d3.schemeCategory10)
-		 */
-		this.colorScale = d3.scaleLinear()
+			.attr("transform", "translate(" + this._width + ", 0)");
+		this._yAxisRightGroup.call(this._yAxisRight);
+		
+		this._dotSelection = null;
+		
+		this._colorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
 			.range(d3.schemeCategory10);
+	}
+	
+	/**
+	 * The X scale of the chart. If scale is given, sets it and also sets the X axes, otherwise returns the current xScale.
+	 * @param {d3.scale} scale - The new xScale.
+	 * @returns {(Pie|d3.scale)} This object or the current xScale.
+	 */
+	xScale(scale) {
+		if (scale) {
+			this._xScale = scale;
+			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
+			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
+			return this;
+		} else {
+			return this._xScale;
+		}
+	}
+	
+	/**
+	 * The Y scale of the chart. If scale is given, sets it and also sets the Y axes, otherwise returns the current yScale.
+	 * @param {d3.scale} scale - The new yScale.
+	 * @returns {(Pie|d3.scale)} This object or the current yScale.
+	 */
+	yScale(scale) {
+		if (scale) {
+			this._yScale = scale;
+			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
+			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
+			return this;
+		} else {
+			return this._yScale;
+		}
+	}
+	
+	/**
+	 * Returns the selection of the dots of the chart.
+	 * @returns {d3.selection} The dots of this chart.
+	 */
+	dotSelection() {
+		return this._dotSelection;
+	}
+	
+	/**
+	 * The color scale of the scatterplot. Used to set the colors of each dot. If scale is given, sets it, otherwise returns the current colorScale.
+	 * @param {d3.scale} scale - The new colorScale.
+	 * @returns {(Pie|d3.scale)} This object or the current colorScale.
+	 */
+	colorScale(scale) {
+		if (scale) {
+			this._colorScale = scale;
+			return this;
+		} else {
+			return this._colorScale;
+		}
 	}
 	
 	/** 
@@ -881,40 +1070,230 @@ class Scatterplot extends Chart {
 	 * @param {number[]} dataset - An array of values for the dots.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the dots.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Scatterplot} This chart.
 	 */
 	setData(dataset, attributes, onEvents) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Adjusting the scales and axis
-		Chart.adjustScaleDomain(this.xScale, this.xAxisTop, this.xAxisTopGroup, d3.min(dataset.map(d=>d[0])), d3.max(dataset.map(d=>d[0])));
-		Chart.adjustScaleDomain(this.xScale, this.xAxisBottom, this.xAxisBottomGroup, d3.min(dataset.map(d=>d[0])), d3.max(dataset.map(d=>d[0])));
-		Chart.adjustScaleDomain(this.yScale, this.yAxisLeft, this.yAxisLeftGroup, d3.min(dataset.map(d=>d[1])), d3.max(dataset.map(d=>d[1])));
-		Chart.adjustScaleDomain(this.yScale, this.yAxisLeft, this.yAxisLeftGroup, d3.min(dataset.map(d=>d[1])), d3.max(dataset.map(d=>d[1])));
+		let minMaxX = d3.extent(dataset.map(d=>d[0]));
+		let minMaxY = d3.extent(dataset.map(d=>d[1]));
+		Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup, minMaxX);
+		Chart.adjustScaleDomain(this._xScale, this._xAxisBottom, this._xAxisBottomGroup, minMaxX);
+		Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, minMaxY);
+		Chart.adjustScaleDomain(this._yScale, this._yAxisRight, this._yAxisRightGroup, minMaxY);
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("dot" + i));
 		attributes["class"] = "dot";
-		Chart.addIfNull(attributes, "cx", (d, i)=>(thisChart.xScale(d[0])));
-		Chart.addIfNull(attributes, "cy", (d, i)=>(thisChart.yScale(d[1])));
+		Chart.addIfNull(attributes, "cx", (d, i)=>(thisChart._xScale(d[0])));
+		Chart.addIfNull(attributes, "cy", (d, i)=>(thisChart._yScale(d[1])));
 		Chart.addIfNull(attributes, "r", "4px");
 		
-		//Column selection and color setting
-		this.dotSelection = this.tag.selectAll(".dot").data(dataset).enter().append("circle")
-			.attr("fill", (d, i)=>(thisChart.colorScale(i % thisChart.colorScale.domain().length)));
+		//Dot selection and color setting
+		this._dotSelection = this._selection.selectAll(".dot").data(dataset).enter().append("circle")
+			.attr("fill", (d, i)=>(thisChart._colorScale(i % thisChart._colorScale.domain().length)));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.dotSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
-	 * Clears the chart, removing all paths and dots.
+	 * Clears the chart, removing all plottings.
+	 * @returns {Scatterplot} This chart.
 	 */
 	clear() {
-		if (this.dotSelection) {
-			this.dotSelection.remove();
-			this.dotSelection = null;
+		if (this._dotSelection) {
+			this._dotSelection.remove();
+			this._dotSelection = null;
 		}
+		return super.clear();
+	}
+}
+
+/**
+ * Class that represents a Pie chart.
+ * @extends Chart
+ */
+class Pie extends Chart {
+	/**
+	 * @constructor
+	 * @param {d3.selection} container - The tag in which the chart will be inserted.
+	 * @param {string} id - The id of the chart tag.
+	 * @param {Object} position - The position of the chart.
+	 * @param {number} position.x - The X coordinate of the chart.
+	 * @param {number} position.y - The Y coordinate of the chart.
+	 * @param {(number|Object)} margins - The margins of the chart. If a number is passed, all its values will be the same.
+	 * @param {number} margins.left - Left margin of the chart.
+	 * @param {number} margins.right - Right margin of the chart.
+	 * @param {number} margins.top - Upper margin of the chart.
+	 * @param {number} margins.bottom - Lower margin of the chart.
+	 * @param {Object} dimensions - The dimensions of the chart.
+	 * @param {number} dimensions.width - The width of the chart, counting the margins.
+	 * @param {number} dimensions.height - The height of the chart, counting the margins.
+	 */
+	constructor(container, id, position, margins, dimensions) {
+		super(container, id, position, margins, dimensions, "pieChart");
+		
+		this._selection.attr("transform", "translate(" + (this._margins.left + this._width / 2) + "," + (this._margins.top + this._height / 2) + ")");
+		
+		this._sliceSelection = null;
+		
+		this._labelSelection = null;
+		
+		this._innerRadius = (d, i)=>0;
+		this._outerRadius = (d, i)=>(d3.min([this._width, this._height]) / 2);
+		
+		this._colorScale = d3.scaleLinear()
+			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
+			.range(d3.schemeCategory10);
+	}
+	
+	/**
+	 * Returns the selection of the slices of the chart.
+	 * @returns {d3.selection} The slices of this chart.
+	 */
+	sliceSelection() {
+		return this._sliceSelection;
+	}
+	
+	/**
+	 * Returns the selection of the labels of each slice.
+	 * @returns {d3.selection} The labels of the slices.
+	 */
+	labelSelection() {
+		return this._labelSelection;
+	}
+	
+	/**
+	 * Function which sets the inner radius of the slice based on its value. If func is given, sets it, otherwise returns the current innerRadius.
+	 * @param {function} func - The new innerRadius.
+	 * @returns {(Pie|function)} This object or the current innerRadius.
+	 */
+	innerRadius(func) {
+		if (func) {
+			this._innerRadius = func;
+			return this;
+		} else {
+			return this._innerRadius;
+		}
+	}
+	
+	/**
+	 * Function which sets the outer radius of the slice based on its value. If func is given, sets it, otherwise returns the current outerRadius.
+	 * @param {function} func - The new outerRadius.
+	 * @returns {(Pie|function)} This object or the current outerRadius.
+	 */
+	outerRadius(func) {
+		if (func) {
+			this._outerRadius = func;
+			return this;
+		} else {
+			return this._outerRadius;
+		}
+	}
+	
+	/**
+	 * The color scale of the pie chart. Used to set the colors of each slice. If scale is given, sets it, otherwise returns the current colorScale.
+	 * @param {d3.scale} scale - The new colorScale.
+	 * @returns {(Pie|d3.scale)} This object or the current colorScale.
+	 */
+	colorScale(scale) {
+		if (scale) {
+			this._colorScale = scale;
+			return this;
+		} else {
+			return this._colorScale;
+		}
+	}
+	
+	/** 
+	 * Inserts data on the pie and plots it.
+	 * @param {number[]} dataset - An array of values for the slices.
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the slices.
+	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Pie} This chart.
+	 */
+	setData(dataset, attributes, onEvents) {
+		let thisChart = this;
+		this._pieData = d3.pie()(dataset);
+		
+		//Mandatory attributes
+		if (attributes == null) attributes = [];
+		Chart.addIfNull(attributes, "id", (d, i)=>("slice" + i));
+		attributes["class"] = "slice";
+		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genSlice(d, i)()));
+		
+		//Slice sliceSelection and color setting
+		this._sliceSelection = this._selection.selectAll(".slice").data(dataset).enter().append("path")
+			.attr("fill", (d, i)=>(thisChart._colorScale(i % thisChart._colorScale.domain().length)));
+		
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this._sliceSelection, attributes, onEvents);
+		
+		return this;
+	}
+	
+	/** 
+	 * Sets the labels of the slices.
+	 * @param {string[]} labels - An array of values for the labels.
+	 * @param {Object} attributes - An object containing functions or constants for attributes of the labels.
+	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Pie} This chart.
+	 */
+	setSliceLabels(labels, attributes, onEvents) {
+		let thisChart = this;
+		let centroids = this._sliceSelection.data().map((d, i)=>this.genSlice(d, i).centroid());
+		
+		//Mandatory attributes
+		if (attributes == null) attributes = [];
+		attributes["class"] = "sliceLabel";
+		Chart.addIfNull(attributes, "x", (d, i)=>(centroids[i][0]));
+		Chart.addIfNull(attributes, "y", (d, i)=>(centroids[i][1]));
+		Chart.addIfNull(attributes, "text-anchor", "middle");
+		Chart.addIfNull(attributes, "dominant-baseline", "middle");
+		
+		this._labelSelection = this._selection.selectAll(".sliceLabel").data(labels).enter().append("text")
+			.text((d, i)=>d);
+		
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this._labelSelection, attributes, onEvents);
+		
+		return this;
+	}
+	
+	/** 
+	 * Generates slices from an array with the Array.prototype.map() function. Also uses values from innerRadius and outerRadius.
+	 * @param {number} d - A value in the array.
+	 * @param {number} i - An index in the array.
+	 * @returns {d3.arc} Arc made with the value of the array.
+	 */
+	genSlice(d, i) {
+		return d3.arc()
+			.innerRadius(this._innerRadius(d, i))
+			.outerRadius(this._outerRadius(d, i))
+			.startAngle(this._pieData[i].startAngle)
+			.endAngle(this._pieData[i].endAngle);
+	}
+	
+	/** 
+	 * Clears the chart, removing all plottings.
+	 * @returns {Pie} This chart.
+	 */
+	clear() {
+		if (this._sliceSelection) {
+			this._sliceSelection.remove();
+			this._sliceSelection = null;
+			this._pieData = null;
+		}
+		if (this._labelSelection) {
+			this._labelSelection.remove();
+			this._labelSelection = null;
+		}
+		return super.clear();
 	}
 }
 
@@ -922,7 +1301,7 @@ class Scatterplot extends Chart {
  * Class that represents a Label table.
  * @extends Chart
  */
-class Labels extends Chart {
+class LabelTable extends Chart {
 	/**
 	 * @constructor
 	 * @param {Chart} chart - The chart of this label table.
@@ -940,37 +1319,52 @@ class Labels extends Chart {
 	 * @param {number} dimensions.height - The height of the chart, counting the margins.
 	 */
 	constructor(chart, id, position, margins, dimensions) {
-		super(chart.tag, id, position, margins, dimensions, "labels");
+		super(chart.selection(), id, position, margins, dimensions, "labels");
 		
-		/**
-		 * The chart of this label table.
-		 * @member {Chart} Label#chart
-		 */
-		this.chart = chart;
+		this._chart = chart;
 		
-		/**
-		 * The rects with the colors of the chart.
-		 * @member {d3.selection} Label#colorSelection
-		 */
-		this.colorSelection = null;
+		this._colorSelection = null;
 		
-		/**
-		 * The texts with the ranges for each color of the chart.
-		 * @member {d3.selection} Label#textSelection
-		 */
-		this.textSelection = null;
+		this._textSelection = null;
 		
-		/**
-		 * The border of the label table.
-		 * @member {d3.selection} Label#border
-		 * @default d3.select("#" + this.chart.id).select("#" + this.id).select(".border")
-		 */
-		this.border = this.tag.append("rect")
+		this._border = this._selection.append("rect")
 			.attr("class", "border")
-			.attr("width", this.width)
-			.attr("height", this.height)
+			.attr("width", this._width)
+			.attr("height", this._height)
 			.attr("stroke", "black")
 			.attr("fill", "white");
+	}
+	
+	/** 
+	 * The chart labelled by this label table.
+	 * @returns {Chart} The chart of this label table.
+	 */
+	chart() {
+		return this._chart;
+	}
+	
+	/**
+	 * Returns the selection of the rects with the color of the chart.
+	 * @returns {d3.selection} The colored rects of this chart.
+	 */
+	colorSelection() {
+		return this._colorSelection;
+	}
+	
+	/**
+	 * Returns the selection of the texts with the labels of the chart.
+	 * @returns {d3.selection} The text labels of this chart.
+	 */
+	textSelection() {
+		return this._textSelection;
+	}
+	
+	/**
+	 * Returns the selection of the border of the label table.
+	 * @returns {d3.selection} The border of this label table.
+	 */
+	border(rect) {
+		return this._border;
 	}
 	
 	/** 
@@ -979,38 +1373,41 @@ class Labels extends Chart {
 	 * @param {(number[]|string[])} values - An array of labels for the colors.
 	 * @param {(function[]|number[])} colorAttributes - An object containing functions or constants for attributes of the color rects.
 	 * @param {(function[]|number[])} valueAttributes - An object containing functions or constants for attributes of the label texts.
+	 * @returns {LabelTable} This label table.
 	 */
 	setValues(colors, values, colorAttributes, valueAttributes) {
-		var thisChart = this;
+		let thisChart = this;
 		
 		//Mandatory attributes of the colors
 		if (colorAttributes == null) colorAttributes = [];
 		colorAttributes["class"] = "colorPlot";
 		Chart.addIfNull(colorAttributes, "x", 0);
-		Chart.addIfNull(colorAttributes, "y", (d, i)=>(i * thisChart.height / colors.length));
-		Chart.addIfNull(colorAttributes, "width", thisChart.height / colors.length);
-		Chart.addIfNull(colorAttributes, "height", thisChart.height / colors.length);
+		Chart.addIfNull(colorAttributes, "y", (d, i)=>(i * thisChart._height / colors.length));
+		Chart.addIfNull(colorAttributes, "width", thisChart._height / colors.length);
+		Chart.addIfNull(colorAttributes, "height", thisChart._height / colors.length);
 		
-		this.colorSelection = this.tag.selectAll("colorPlot").data(colors).enter().append("rect")
+		this._colorSelection = this._selection.selectAll("colorPlot").data(colors).enter().append("rect")
 			.attr("fill", (d, i)=>d);
 		
 		//Insertion of attributes
-		Chart.insertAttributesEvents(this.colorSelection, colorAttributes, null);
+		Chart.insertAttributesEvents(this._colorSelection, colorAttributes, null);
 		
 		//Mandatory attributes of the texts
 		if (valueAttributes == null) valueAttributes = [];
 		valueAttributes["class"] = "colorLabel";
 		Chart.addIfNull(valueAttributes, "x", colorAttributes["width"] + 5);
 		Chart.addIfNull(valueAttributes, "y", colorAttributes["y"]);
-		Chart.addIfNull(valueAttributes, "width", thisChart.width - valueAttributes["x"]);
+		Chart.addIfNull(valueAttributes, "width", thisChart._width - valueAttributes["x"]);
 		Chart.addIfNull(valueAttributes, "height", colorAttributes["height"]);
 		
-		this.textSelection = this.tag.selectAll("colorLabel").data(values).enter().append("text")
+		this._textSelection = this._selection.selectAll("colorLabel").data(values).enter().append("text")
 			.text(d=>d)
 			.attr("dominant-baseline", "hanging");
 		
 		//Insertion of attributes
-		Chart.insertAttributesEvents(this.textSelection, valueAttributes, null);
+		Chart.insertAttributesEvents(this._textSelection, valueAttributes, null);
+		
+		return this;
 	}
 }</code></pre>
         </article>
@@ -1022,13 +1419,13 @@ class Labels extends Chart {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Chart.html">Chart</a></li><li><a href="Histogram.html">Histogram</a></li><li><a href="Labels.html">Labels</a></li><li><a href="Map.html">Map</a></li><li><a href="Scatterplot.html">Scatterplot</a></li><li><a href="Segments.html">Segments</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Chart.html">Chart</a></li><li><a href="Histogram.html">Histogram</a></li><li><a href="LabelTable.html">LabelTable</a></li><li><a href="Map.html">Map</a></li><li><a href="Pie.html">Pie</a></li><li><a href="Scatterplot.html">Scatterplot</a></li><li><a href="Segments.html">Segments</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat May 19 2018 21:47:12 GMT-0300 (E. South America Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jun 02 2018 23:16:25 GMT-0300 (E. South America Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
