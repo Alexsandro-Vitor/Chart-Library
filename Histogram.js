@@ -52,27 +52,13 @@ class Histogram extends Chart {
 			.attr("transform", "translate(0," + this._height  + ")");
 		this.xAxisGroup.call(this.xAxis);
 		
-		/**
-		 * The Y scale of the histogram. Used by the axis and the columns.
-		 * @member {d3.scale} Histogram#yScale
-		 * @default d3.scaleLinear().range([this.height(), 0])
-		 */
-		this.yScale = d3.scaleLinear()
+		this._yScale = d3.scaleLinear()
 			.range([this._height, 0]);
-		/**
-		 * The Y axis of the histogram.
-		 * @member {d3.axis} Histogram#yAxis
-		 * @default d3.axisLeft(this.yScale)
-		 */
-		this.yAxis = d3.axisLeft(this.yScale);
-		/**
-		 * The group of the Y axis.
-		 * @member {d3.selection} Histogram#yAxisGroup
-		 */
-		this.yAxisGroup = this._selection
+		this._yAxis = d3.axisLeft(this._yScale);
+		this._yAxisGroup = this._selection
 			.append("g")
 			.attr("class", "yAxis");
-		this.yAxisGroup.call(this.yAxis);
+		this._yAxisGroup.call(this._yAxis);
 		
 		/**
 		 * The names of the columns.
@@ -80,11 +66,7 @@ class Histogram extends Chart {
 		 */
 		this.xAxisNames = [];
 		
-		/**
-		 * The columns of the histogram.
-		 * @member {d3.selection} Histogram#colSelection
-		 */
-		this.colSelection = null;
+		this._colSelection = null;
 		
 		/**
 		 * The color scale of the histogram. Used to set the colors of each column in the histogram.
@@ -116,34 +98,60 @@ class Histogram extends Chart {
 			.range([sequence[1], sequence[this.xAxisNames.length]]);
 	}
 	
+	/**
+	 * The Y scale of the chart. If scale is given, sets it and also sets the Y axis, otherwise returns the current yScale.
+	 * @param {d3.scale} scale - The new yScale.
+	 * @returns {(Segments|d3.scale)} This object or the current yScale.
+	 */
+	yScale(scale) {
+		if (scale) {
+			this._yScale = scale;
+			Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, d3.extent(this._yScale.domain()));
+			return this;
+		} else {
+			return this._yScale;
+		}
+	}
+	
+	/**
+	 * Returns the selection of the columns of the chart.
+	 * @returns {d3.selection} The columns of this chart.
+	 */
+	colSelection() {
+		return this._colSelection;
+	}
+	
 	/** 
 	 * Inserts data on the histogram and plots it.
 	 * @param {number[]} dataset - An array of values for the columns.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the columns.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Histogram} This chart.
 	 */
 	setData(dataset, attributes, onEvents) {
 		let colWidth = this._width / (this.xAxisNames.length + 1);
 		let thisChart = this;
 		
 		//Adjusting the yScale and axis
-		Chart.adjustScaleDomain(this.yScale, this.yAxis, this.yAxisGroup, [0, d3.max(dataset)]);
+		Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, [0, d3.max(dataset)]);
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("col" + thisChart.xAxisNames[i]));
 		attributes["class"] = "column";
 		Chart.addIfNull(attributes, "x", (d, i)=>(thisChart.xScale(i) - colWidth/2));
-		Chart.addIfNull(attributes, "y", (d, i)=>(thisChart.yScale(d)));
+		Chart.addIfNull(attributes, "y", (d, i)=>(thisChart._yScale(d)));
 		Chart.addIfNull(attributes, "width", colWidth);
-		Chart.addIfNull(attributes, "height", (d, i)=>(thisChart._height - thisChart.yScale(d)));
+		Chart.addIfNull(attributes, "height", (d, i)=>(thisChart._height - thisChart._yScale(d)));
 		
 		//Column selection and color setting
-		this.colSelection = this._selection.selectAll(".column").data(dataset).enter().append("rect")
+		this._colSelection = this._selection.selectAll(".column").data(dataset).enter().append("rect")
 			.attr("fill", (d, i)=>(thisChart.colorScale(i % thisChart.colorScale.domain().length)));
 		
 		//Insertion of attributes and events
-		Chart.insertAttributesEvents(this.colSelection, attributes, onEvents);
+		Chart.insertAttributesEvents(this._colSelection, attributes, onEvents);
+		
+		return this;
 	}
 	
 	/** 
@@ -156,6 +164,18 @@ class Histogram extends Chart {
 			.domain(sequence)
 			.range(newColors);
 		let thisChart = this;
-		if (this.colSelection != null) this.colSelection.attr("fill", (d, i)=>(thisChart.colorScale(i % newColors.length)));
+		if (this._colSelection != null) this._colSelection.attr("fill", (d, i)=>(thisChart.colorScale(i % newColors.length)));
+	}
+	
+	/** 
+	 * Clears the chart, removing all plottings.
+	 * @returns {Histogram} This chart.
+	 */
+	clear() {
+		if (this._colSelection) {
+			this._colSelection.remove();
+			this._colSelection = null;
+		}
+		return super.clear();
 	}
 }

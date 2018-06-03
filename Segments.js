@@ -187,6 +187,7 @@ class Segments extends Chart {
 	 * @param {number[][]} dataset - An array of arrays for each segment.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the segments.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Segments} This chart.
 	 */
 	setSegments(dataset, attributes, onEvents) {
 		let thisChart = this;
@@ -226,6 +227,7 @@ class Segments extends Chart {
 	 * @param {number[][]} dataset - An array of arrays for each dot.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the dots.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Segments} This chart.
 	 */
 	setDots(dataset, attributes, onEvents) {
 		let thisChart = this;
@@ -271,6 +273,7 @@ class Segments extends Chart {
 	 * @param {number[]} dataset[i][a] - Array with the minimum and maximum values (respectively) at index 'a'.
 	 * @param {Object} attributes - An object containing functions or constants for attributes of the ranges.
 	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Segments} This chart.
 	 */
 	setRanges(dataset, attributes, onEvents) {		
 		let thisChart = this;
