@@ -67,7 +67,6 @@ class Histogram extends Chart {
 			this._xScale
 				.domain([0, scale.domain().length - 3])
 				.range([scale.range()[1], scale.range()[scale.domain().length - 2]]);
-			console.log(this._xScale.range());
 			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup, this._xAxisScale.domain());
 			return this;
 		} else {

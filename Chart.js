@@ -118,17 +118,13 @@
 	}
 	
 	/**
-	 * The label table of the chart. If table is given, sets the label table. If no value is given, returns the current label table.
+	 * The label table of the chart. If table is given, sets the label table. Always returns the current or, if set, the new label table.
 	 * @param {LabelTable} table - The new label table.
-	 * @returns {(Chart|LabelTable)} This object or the current label table.
+	 * @returns {LabelTable} The new label table.
 	 */
 	labelTable(table) {
-		if (table) {
-			this._labelTable = table;
-			return this;
-		} else {
-			return this._labelTable;
-		}
+		if (table) this._labelTable = table;
+		return this._labelTable;
 	}
 	
 	/** 
