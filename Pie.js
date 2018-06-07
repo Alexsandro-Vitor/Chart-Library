@@ -109,7 +109,7 @@ class Pie extends Chart {
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("slice" + i));
 		attributes["class"] = "slice";
-		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.genSlice(d, i)()));
+		Chart.addIfNull(attributes, "d", (d, i)=>(this.genSlice(d, i)()));
 		
 		//Slice sliceSelection and color setting
 		this._sliceSelection = this._selection.selectAll(".slice").data(dataset).enter().append("path")
@@ -129,7 +129,6 @@ class Pie extends Chart {
 	 * @returns {Pie} This chart.
 	 */
 	setSliceLabels(labels, attributes, onEvents) {
-		let thisChart = this;
 		let centroids = this._sliceSelection.data().map((d, i)=>this.genSlice(d, i).centroid());
 		
 		//Mandatory attributes

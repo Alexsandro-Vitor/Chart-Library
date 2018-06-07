@@ -145,7 +145,7 @@ class Map extends Chart {
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>d.properties.L1);
 		attributes["class"] = "mapPath";
-		Chart.addIfNull(attributes, "d", (d, i)=>thisChart._geoPath(d.geometry));
+		Chart.addIfNull(attributes, "d", (d, i)=>this._geoPath(d.geometry));
 		
 		this._pathSelection = this._selection.selectAll(".mapPath").data(geojson.features).enter().append("path")
 			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));

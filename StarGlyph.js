@@ -20,7 +20,7 @@ class StarGlyph extends Chart {
 	 * @param {number} dimensions.height - The height of the chart, counting the margins.
 	 */
 	constructor(container, id, position, margins, dimensions) {
-		super(container, id, position, margins, dimensions, "starGlyph");
+		super(container, id, position, margins, dimensions, "starGlyphChart");
 		
 		this._selection.attr("transform", "translate(" + (this._margins.left + this._width / 2) + "," + (this._margins.top + this._height / 2) + ")");
 		

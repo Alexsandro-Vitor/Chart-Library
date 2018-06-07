@@ -198,8 +198,6 @@ class Segments extends Chart {
 	 * @returns {Segments} This chart.
 	 */
 	setSegments(dataset, attributes, onEvents) {
-		let thisChart = this;
-		
 		//Adjusting the yScale and axis
 		let datasetExtent = dataset.map(d=>d3.extent(d));
 		datasetExtent.push(this._yScale.domain());
@@ -210,7 +208,7 @@ class Segments extends Chart {
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("seg" + i));
 		attributes["class"] = "segment";
-		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.segPathGenerator(d)));
+		Chart.addIfNull(attributes, "d", (d, i)=>(this.segPathGenerator(d)));
 		Chart.addIfNull(attributes, "stroke", "black");
 		
 		this._segSelection = this._segLayer.selectAll(".segment").data(dataset).enter().append("path")
@@ -219,10 +217,10 @@ class Segments extends Chart {
 		//Updating previous selections
 		if (this._dotSelection) {
 			this._dotSelection
-				.attr("cx", (d, i)=>thisChart._xScale(i))
-				.attr("cy", (d, i)=>thisChart._yScale(d));
+				.attr("cx", (d, i)=>this._xScale(i))
+				.attr("cy", (d, i)=>this._yScale(d));
 		}
-		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(thisChart.rangePathGenerator(d)));
+		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(this.rangePathGenerator(d)));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._segSelection, attributes, onEvents);
@@ -251,8 +249,8 @@ class Segments extends Chart {
 		Chart.addIfNull(attributes, "id", (d, i)=>("dotGroup" + i));
 		attributes["class"] = "dotGroup";
 		Chart.addIfNull(attributes, "r", "5px");
-		Chart.addIfNull(attributes, "cx", (d, i)=>thisChart._xScale(i));
-		Chart.addIfNull(attributes, "cy", (d, i)=>thisChart._yScale(d));
+		Chart.addIfNull(attributes, "cx", (d, i)=>this._xScale(i));
+		Chart.addIfNull(attributes, "cy", (d, i)=>this._yScale(d));
 		
 		//Creating the groups
 		this._dotSelection = this._dotLayer.selectAll(".dotGroup").data(dataset).enter().append("g")
@@ -262,10 +260,10 @@ class Segments extends Chart {
 			.selectAll(".groupDot").data(d=>d).enter().append("circle");
 		
 		//Updating previous selections
-		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(thisChart.segPathGenerator(d)));
-		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(thisChart.rangePathGenerator(d)));
+		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(this.segPathGenerator(d)));
+		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(this.rangePathGenerator(d)));
 		
-		attributes["id"] = (d, i)=>("dot_" + thisChart._xAxisScale.domain()[i]);
+		attributes["id"] = (d, i)=>("dot_" + this._xAxisScale.domain()[i]);
 		attributes["class"] = "groupDot";
 		
 		//Insertion of attributes and events
@@ -296,7 +294,7 @@ class Segments extends Chart {
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("range" + i));
 		attributes["class"] = "range";
-		Chart.addIfNull(attributes, "d", (d, i)=>(thisChart.rangePathGenerator(d)));
+		Chart.addIfNull(attributes, "d", (d, i)=>(this.rangePathGenerator(d)));
 		
 		this._rangeSelection = this._rangeLayer.selectAll(".range").data(dataset).enter().append("path")
 			.attr("fill", (d, i)=>(thisChart._rangeColorScale(i % thisChart._rangeColorScale.domain().length)));
@@ -304,10 +302,10 @@ class Segments extends Chart {
 		//Updating previous selections
 		if (this._dotSelection) {
 			this._dotSelection
-				.attr("cx", (d, i)=>thisChart._xScale(i))
-				.attr("cy", (d, i)=>thisChart._yScale(d));
+				.attr("cx", (d, i)=>this._xScale(i))
+				.attr("cy", (d, i)=>this._yScale(d));
 		}
-		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(thisChart.segPathGenerator(d)));
+		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(this.segPathGenerator(d)));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._rangeSelection, attributes, onEvents);

@@ -105,8 +105,7 @@ class Histogram extends Chart {
 	colorScale(scale) {
 		if (scale) {
 			this._colorScale = scale;
-			let thisChart = this;
-			if (this._colSelection != null) this._colSelection.attr("fill", (d, i)=>(thisChart._colorScale(i % scale.range().length)));
+			if (this._colSelection != null) this._colSelection.attr("fill", (d, i)=>(this._colorScale(i % scale.range().length)));
 			return this;
 		} else {
 			return this._colorScale;
@@ -129,12 +128,12 @@ class Histogram extends Chart {
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
-		Chart.addIfNull(attributes, "id", (d, i)=>("col" + thisChart._xAxisScale.domain()[i+1]));
+		Chart.addIfNull(attributes, "id", (d, i)=>("col" + this._xAxisScale.domain()[i+1]));
 		attributes["class"] = "column";
-		Chart.addIfNull(attributes, "x", (d, i)=>(thisChart._xScale(i) - colWidth/2));
-		Chart.addIfNull(attributes, "y", (d, i)=>(thisChart._yScale(d)));
+		Chart.addIfNull(attributes, "x", (d, i)=>(this._xScale(i) - colWidth/2));
+		Chart.addIfNull(attributes, "y", (d, i)=>(this._yScale(d)));
 		Chart.addIfNull(attributes, "width", colWidth);
-		Chart.addIfNull(attributes, "height", (d, i)=>(thisChart._height - thisChart._yScale(d)));
+		Chart.addIfNull(attributes, "height", (d, i)=>(this._height - this._yScale(d)));
 		
 		//Column selection and color setting
 		this._colSelection = this._selection.selectAll(".column").data(dataset).enter().append("rect")
