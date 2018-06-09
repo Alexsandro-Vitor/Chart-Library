@@ -191,7 +191,7 @@
 	 * @param {number[]} domain - The new domain of the scale.
 	 */
 	static adjustScaleDomain(scale, axis, axisGroup, domain) {
-		scale.domain(domain);
+		if (domain) scale.domain(domain);
 		axis.scale(scale);
 		axisGroup.call(axis);
 	}
@@ -286,7 +286,7 @@ class Histogram extends Chart {
 	/**
 	 * The X scale of the axis. If scale is given, sets it and also sets the X axis, otherwise returns the current xAxisScale.
 	 * @param {d3.scale} scale - The new xAxisScale.
-	 * @returns {(Segments|d3.scale)} This object or the current xAxisScale.
+	 * @returns {(Histogram|d3.scale)} This object or the current xAxisScale.
 	 */
 	xAxisScale(scale) {
 		if (scale) {
@@ -304,7 +304,7 @@ class Histogram extends Chart {
 	/**
 	 * The Y scale of the chart. If scale is given, sets it and also sets the Y axis, otherwise returns the current yScale.
 	 * @param {d3.scale} scale - The new yScale.
-	 * @returns {(Segments|d3.scale)} This object or the current yScale.
+	 * @returns {(Histogram|d3.scale)} This object or the current yScale.
 	 */
 	yScale(scale) {
 		if (scale) {
@@ -327,7 +327,7 @@ class Histogram extends Chart {
 	/**
 	 * The color scale of the histogram. Used to set the colors of each column in the histogram. If scale is given, sets it and also changes the current column colors, otherwise returns the current colorScale.
 	 * @param {d3.scale} scale - The new colorScale.
-	 * @returns {(Pie|d3.scale)} This object or the current colorScale.
+	 * @returns {(Histogram|d3.scale)} This object or the current colorScale.
 	 */
 	colorScale(scale) {
 		if (scale) {
@@ -475,7 +475,7 @@ class Segments extends Chart {
 		if (scale) {
 			this._xAxisScale = scale;
 			this._xScale.domain([0, scale.domain().length-1]);
-			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup, this._xAxisScale.domain());
+			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup);
 			return this;
 		} else {
 			return this._xScale;
@@ -490,7 +490,7 @@ class Segments extends Chart {
 	yScale(scale) {
 		if (scale) {
 			this._yScale = scale;
-			Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, d3.extent(this._yScale.domain()));
+			Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup);
 			return this;
 		} else {
 			return this._yScale;
@@ -964,7 +964,7 @@ class Scatterplot extends Chart {
 	 * @param {number} dimensions.height - The height of the chart, counting the margins.
 	 */
 	constructor(container, id, position, margins, dimensions) {
-		super(container, id, position, margins, dimensions, "scatteplotChart");
+		super(container, id, position, margins, dimensions, "scatterplotChart");
 		
 		this._xScale = d3.scaleLinear()
 			.range([0, this._width]);
@@ -1003,18 +1003,21 @@ class Scatterplot extends Chart {
 		this._colorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
 			.range(d3.schemeCategory10);
+		
+		this._fillFunction = (d, i)=>this._colorScale(i % this._colorScale.domain().length);
 	}
 	
 	/**
 	 * The X scale of the chart. If scale is given, sets it and also sets the X axes, otherwise returns the current xScale.
 	 * @param {d3.scale} scale - The new xScale.
-	 * @returns {(Pie|d3.scale)} This object or the current xScale.
+	 * @returns {(Scatterplot|d3.scale)} This object or the current xScale.
 	 */
 	xScale(scale) {
 		if (scale) {
 			this._xScale = scale;
-			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
-			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
+			Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup);
+			Chart.adjustScaleDomain(this._xScale, this._xAxisBottom, this._xAxisBottomGroup);
+			if (this._dotSelection) this._dotSelection.attr("cx", (d, i)=>this._xScale(d[0]));
 			return this;
 		} else {
 			return this._xScale;
@@ -1024,13 +1027,14 @@ class Scatterplot extends Chart {
 	/**
 	 * The Y scale of the chart. If scale is given, sets it and also sets the Y axes, otherwise returns the current yScale.
 	 * @param {d3.scale} scale - The new yScale.
-	 * @returns {(Pie|d3.scale)} This object or the current yScale.
+	 * @returns {(Scatterplot|d3.scale)} This object or the current yScale.
 	 */
 	yScale(scale) {
 		if (scale) {
 			this._yScale = scale;
-			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
-			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
+			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup);
+			Chart.adjustScaleDomain(this._yScale, this._yAxisRight, this._yAxisRightGroup);
+			if (this._dotSelection) this._dotSelection.attr("cy", (d, i)=>this._yScale(d[1]));
 			return this;
 		} else {
 			return this._yScale;
@@ -1048,7 +1052,7 @@ class Scatterplot extends Chart {
 	/**
 	 * The color scale of the scatterplot. Used to set the colors of each dot. If scale is given, sets it, otherwise returns the current colorScale.
 	 * @param {d3.scale} scale - The new colorScale.
-	 * @returns {(Pie|d3.scale)} This object or the current colorScale.
+	 * @returns {(Scatterplot|d3.scale)} This object or the current colorScale.
 	 */
 	colorScale(scale) {
 		if (scale) {
@@ -1057,6 +1061,21 @@ class Scatterplot extends Chart {
 		} else {
 			return this._colorScale;
 		}
+	}
+	
+	/**
+	 * The function which sets the colors of the dots. If a function is given, sets fillFunction. Setting func to null will reset fillFunction to its default value: (d, i)=>this._colorScale(i % this._colorScale.domain().length). Not passing a value makes it return the current fillFunction.
+	 * @param {function} func - The new fillFunction.
+	 * @returns {(Scatterplot|function)} This object or the current fillFunction.
+	 */
+	fillFunction(func) {
+		let thisChart = this;
+		if (func) this._fillFunction = func;
+		else if (func === null) this._fillFunction = (d, i)=>this._colorScale(i % this._colorScale.domain().length);
+		else return this._fillFunction;
+		
+		if (this._dotSelection) this._dotSelection.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
+		return this;
 	}
 	
 	/** 
@@ -1069,14 +1088,6 @@ class Scatterplot extends Chart {
 	setData(dataset, attributes, onEvents) {
 		let thisChart = this;
 		
-		//Adjusting the scales and axis
-		let minMaxX = d3.extent(dataset.map(d=>d[0]));
-		let minMaxY = d3.extent(dataset.map(d=>d[1]));
-		Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup, minMaxX);
-		Chart.adjustScaleDomain(this._xScale, this._xAxisBottom, this._xAxisBottomGroup, minMaxX);
-		Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, minMaxY);
-		Chart.adjustScaleDomain(this._yScale, this._yAxisRight, this._yAxisRightGroup, minMaxY);
-		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("dot" + i));
@@ -1085,9 +1096,17 @@ class Scatterplot extends Chart {
 		Chart.addIfNull(attributes, "cy", (d, i)=>(this._yScale(d[1])));
 		Chart.addIfNull(attributes, "r", "4px");
 		
+		//Adjusting the scales and axis
+		let minMaxX = d3.extent(dataset.map((d, i)=>this._xScale.invert(attributes.cx(d, i))));
+		let minMaxY = d3.extent(dataset.map((d, i)=>this._yScale.invert(attributes.cy(d, i))));
+		Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup, minMaxX);
+		Chart.adjustScaleDomain(this._xScale, this._xAxisBottom, this._xAxisBottomGroup, minMaxX);
+		Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, minMaxY);
+		Chart.adjustScaleDomain(this._yScale, this._yAxisRight, this._yAxisRightGroup, minMaxY);
+		
 		//Dot selection and color setting
 		this._dotSelection = this._selection.selectAll(".dot").data(dataset).enter().append("circle")
-			.attr("fill", (d, i)=>(thisChart._colorScale(i % thisChart._colorScale.domain().length)));
+			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
@@ -1602,7 +1621,7 @@ class LabelTable extends Chart {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Jun 07 2018 19:02:44 GMT-0300 (E. South America Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jun 09 2018 15:15:39 GMT-0300 (E. South America Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

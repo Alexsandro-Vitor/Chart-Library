@@ -163,7 +163,7 @@
 	 * @param {number[]} domain - The new domain of the scale.
 	 */
 	static adjustScaleDomain(scale, axis, axisGroup, domain) {
-		scale.domain(domain);
+		if (domain) scale.domain(domain);
 		axis.scale(scale);
 		axisGroup.call(axis);
 	}
@@ -447,7 +447,7 @@ class Segments extends Chart {
 		if (scale) {
 			this._xAxisScale = scale;
 			this._xScale.domain([0, scale.domain().length-1]);
-			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup, this._xAxisScale.domain());
+			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup);
 			return this;
 		} else {
 			return this._xScale;
@@ -462,7 +462,7 @@ class Segments extends Chart {
 	yScale(scale) {
 		if (scale) {
 			this._yScale = scale;
-			Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, d3.extent(this._yScale.domain()));
+			Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup);
 			return this;
 		} else {
 			return this._yScale;
@@ -975,6 +975,8 @@ class Scatterplot extends Chart {
 		this._colorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
 			.range(d3.schemeCategory10);
+		
+		this._fillFunction = (d, i)=>this._colorScale(i % this._colorScale.domain().length);
 	}
 	
 	/**
@@ -985,8 +987,9 @@ class Scatterplot extends Chart {
 	xScale(scale) {
 		if (scale) {
 			this._xScale = scale;
-			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
-			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
+			Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup);
+			Chart.adjustScaleDomain(this._xScale, this._xAxisBottom, this._xAxisBottomGroup);
+			if (this._dotSelection) this._dotSelection.attr("cx", (d, i)=>this._xScale(d[0]));
 			return this;
 		} else {
 			return this._xScale;
@@ -1001,8 +1004,9 @@ class Scatterplot extends Chart {
 	yScale(scale) {
 		if (scale) {
 			this._yScale = scale;
-			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
-			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
+			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup);
+			Chart.adjustScaleDomain(this._yScale, this._yAxisRight, this._yAxisRightGroup);
+			if (this._dotSelection) this._dotSelection.attr("cy", (d, i)=>this._yScale(d[1]));
 			return this;
 		} else {
 			return this._yScale;
@@ -1029,6 +1033,21 @@ class Scatterplot extends Chart {
 		} else {
 			return this._colorScale;
 		}
+	}
+	
+	/**
+	 * The function which sets the colors of the dots. If a function is given, sets fillFunction. Setting func to null will reset fillFunction to its default value: (d, i)=>this._colorScale(i % this._colorScale.domain().length). Not passing a value makes it return the current fillFunction.
+	 * @param {function} func - The new fillFunction.
+	 * @returns {(Scatterplot|function)} This object or the current fillFunction.
+	 */
+	fillFunction(func) {
+		let thisChart = this;
+		if (func) this._fillFunction = func;
+		else if (func === null) this._fillFunction = (d, i)=>this._colorScale(i % this._colorScale.domain().length);
+		else return this._fillFunction;
+		
+		if (this._dotSelection) this._dotSelection.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
+		return this;
 	}
 	
 	/** 
@@ -1059,7 +1078,7 @@ class Scatterplot extends Chart {
 		
 		//Dot selection and color setting
 		this._dotSelection = this._selection.selectAll(".dot").data(dataset).enter().append("circle")
-			.attr("fill", (d, i)=>(thisChart._colorScale(i % thisChart._colorScale.domain().length)));
+			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);

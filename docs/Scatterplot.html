@@ -621,7 +621,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1074">line 1074</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1093">line 1093</a>
     </li></ul></dd>
     
 
@@ -677,7 +677,7 @@
     
 
     
-    <h4 class="name" id="colorScale"><span class="type-signature"></span>colorScale<span class="signature">(scale)</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>|d3.scale}</span></h4>
+    <h4 class="name" id="colorScale"><span class="type-signature"></span>colorScale<span class="signature">(scale)</span><span class="type-signature"> &rarr; {<a href="Scatterplot.html">Scatterplot</a>|d3.scale}</span></h4>
     
 
     
@@ -778,7 +778,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1025">line 1025</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1029">line 1029</a>
     </li></ul></dd>
     
 
@@ -816,7 +816,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="Pie.html">Pie</a></span>
+<span class="param-type"><a href="Scatterplot.html">Scatterplot</a></span>
 |
 
 <span class="param-type">d3.scale</span>
@@ -1002,7 +1002,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1016">line 1016</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1020">line 1020</a>
     </li></ul></dd>
     
 
@@ -1041,6 +1041,166 @@
     <dd>
         
 <span class="param-type">d3.selection</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fillFunction"><span class="type-signature"></span>fillFunction<span class="signature">(func)</span><span class="type-signature"> &rarr; {<a href="Scatterplot.html">Scatterplot</a>|function}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    The function which sets the colors of the dots. If a function is given, sets fillFunction. Setting func to null will reset fillFunction to its default value: (d, i)=>this._colorScale(i % this._colorScale.domain().length). Not passing a value makes it return the current fillFunction.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>func</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new fillFunction.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1043">line 1043</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    This object or the current fillFunction.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Scatterplot.html">Scatterplot</a></span>
+|
+
+<span class="param-type">function</span>
 
 
     </dd>
@@ -1984,7 +2144,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1041">line 1041</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1060">line 1060</a>
     </li></ul></dd>
     
 
@@ -2153,7 +2313,7 @@
     
 
     
-    <h4 class="name" id="xScale"><span class="type-signature"></span>xScale<span class="signature">(scale)</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>|d3.scale}</span></h4>
+    <h4 class="name" id="xScale"><span class="type-signature"></span>xScale<span class="signature">(scale)</span><span class="type-signature"> &rarr; {<a href="Scatterplot.html">Scatterplot</a>|d3.scale}</span></h4>
     
 
     
@@ -2254,7 +2414,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line985">line 985</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line987">line 987</a>
     </li></ul></dd>
     
 
@@ -2292,7 +2452,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="Pie.html">Pie</a></span>
+<span class="param-type"><a href="Scatterplot.html">Scatterplot</a></span>
 |
 
 <span class="param-type">d3.scale</span>
@@ -2313,7 +2473,7 @@
     
 
     
-    <h4 class="name" id="yScale"><span class="type-signature"></span>yScale<span class="signature">(scale)</span><span class="type-signature"> &rarr; {<a href="Pie.html">Pie</a>|d3.scale}</span></h4>
+    <h4 class="name" id="yScale"><span class="type-signature"></span>yScale<span class="signature">(scale)</span><span class="type-signature"> &rarr; {<a href="Scatterplot.html">Scatterplot</a>|d3.scale}</span></h4>
     
 
     
@@ -2414,7 +2574,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1001">line 1001</a>
+        <a href="Chart-Library.js.html">Chart-Library.js</a>, <a href="Chart-Library.js.html#line1004">line 1004</a>
     </li></ul></dd>
     
 
@@ -2452,7 +2612,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="Pie.html">Pie</a></span>
+<span class="param-type"><a href="Scatterplot.html">Scatterplot</a></span>
 |
 
 <span class="param-type">d3.scale</span>
@@ -2489,7 +2649,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Jun 07 2018 19:02:44 GMT-0300 (E. South America Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jun 09 2018 15:15:39 GMT-0300 (E. South America Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
