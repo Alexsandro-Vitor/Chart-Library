@@ -134,7 +134,6 @@ class Scatterplot extends Chart {
 		Chart.addIfNull(attributes, "r", "4px");
 		
 		//Adjusting the scales and axis
-		console.log(dataset.map((d, i)=>this._xScale.invert(attributes["cx"](d, i))));
 		let minMaxX = d3.extent(dataset.map((d, i)=>this._xScale.invert(attributes.cx(d, i))));
 		let minMaxY = d3.extent(dataset.map((d, i)=>this._yScale.invert(attributes.cy(d, i))));
 		Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup, minMaxX);

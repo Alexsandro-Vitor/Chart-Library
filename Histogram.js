@@ -59,7 +59,7 @@ class Histogram extends Chart {
 	/**
 	 * The X scale of the axis. If scale is given, sets it and also sets the X axis, otherwise returns the current xAxisScale.
 	 * @param {d3.scale} scale - The new xAxisScale.
-	 * @returns {(Segments|d3.scale)} This object or the current xAxisScale.
+	 * @returns {(Histogram|d3.scale)} This object or the current xAxisScale.
 	 */
 	xAxisScale(scale) {
 		if (scale) {
@@ -77,7 +77,7 @@ class Histogram extends Chart {
 	/**
 	 * The Y scale of the chart. If scale is given, sets it and also sets the Y axis, otherwise returns the current yScale.
 	 * @param {d3.scale} scale - The new yScale.
-	 * @returns {(Segments|d3.scale)} This object or the current yScale.
+	 * @returns {(Histogram|d3.scale)} This object or the current yScale.
 	 */
 	yScale(scale) {
 		if (scale) {
@@ -100,7 +100,7 @@ class Histogram extends Chart {
 	/**
 	 * The color scale of the histogram. Used to set the colors of each column in the histogram. If scale is given, sets it and also changes the current column colors, otherwise returns the current colorScale.
 	 * @param {d3.scale} scale - The new colorScale.
-	 * @returns {(Pie|d3.scale)} This object or the current colorScale.
+	 * @returns {(Histogram|d3.scale)} This object or the current colorScale.
 	 */
 	colorScale(scale) {
 		if (scale) {
