@@ -60,7 +60,7 @@ class Scatterplot extends Chart {
 			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
 			.range(d3.schemeCategory10);
 		
-		this._attributes = [];
+		this._fillFunction = (d, i)=>this._colorScale(i % this._colorScale.domain().length);
 	}
 	
 	/**
@@ -119,6 +119,21 @@ class Scatterplot extends Chart {
 		}
 	}
 	
+	/**
+	 * The function which sets the colors of the dots. If a function is given, sets fillFunction. Setting func to null will reset fillFunction to its default value: (d, i)=>this._colorScale(i % this._colorScale.domain().length). Not passing a value makes it return the current fillFunction.
+	 * @param {function} func - The new fillFunction.
+	 * @returns {(Scatterplot|function)} This object or the current fillFunction.
+	 */
+	fillFunction(func) {
+		let thisChart = this;
+		if (func) this._fillFunction = func;
+		else if (func === null) this._fillFunction = (d, i)=>this._colorScale(i % this._colorScale.domain().length);
+		else return this._fillFunction;
+		
+		if (this._dotSelection) this._dotSelection.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
+		return this;
+	}
+	
 	/** 
 	 * Inserts data on the scatterplot and plots it.
 	 * @param {number[]} dataset - An array of values for the dots.
@@ -137,9 +152,6 @@ class Scatterplot extends Chart {
 		Chart.addIfNull(attributes, "cy", (d, i)=>(this._yScale(d[1])));
 		Chart.addIfNull(attributes, "r", "4px");
 		
-		this._attributes.cx = attributes.cx;
-		this._attributes.cy = attributes.cy;
-		
 		//Adjusting the scales and axis
 		let minMaxX = d3.extent(dataset.map((d, i)=>this._xScale.invert(attributes.cx(d, i))));
 		let minMaxY = d3.extent(dataset.map((d, i)=>this._yScale.invert(attributes.cy(d, i))));
@@ -150,7 +162,7 @@ class Scatterplot extends Chart {
 		
 		//Dot selection and color setting
 		this._dotSelection = this._selection.selectAll(".dot").data(dataset).enter().append("circle")
-			.attr("fill", (d, i)=>(thisChart._colorScale(i % thisChart._colorScale.domain().length)));
+			.attr("fill", (d, i)=>thisChart._fillFunction(d, i));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
