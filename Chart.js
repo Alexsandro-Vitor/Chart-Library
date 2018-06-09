@@ -163,7 +163,7 @@
 	 * @param {number[]} domain - The new domain of the scale.
 	 */
 	static adjustScaleDomain(scale, axis, axisGroup, domain) {
-		scale.domain(domain);
+		if (domain) scale.domain(domain);
 		axis.scale(scale);
 		axisGroup.call(axis);
 	}

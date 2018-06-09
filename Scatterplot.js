@@ -59,6 +59,8 @@ class Scatterplot extends Chart {
 		this._colorScale = d3.scaleLinear()
 			.domain(Chart.genSequence(0, d3.schemeCategory10.length, d3.schemeCategory10.length - 1))
 			.range(d3.schemeCategory10);
+		
+		this._attributes = [];
 	}
 	
 	/**
@@ -69,8 +71,9 @@ class Scatterplot extends Chart {
 	xScale(scale) {
 		if (scale) {
 			this._xScale = scale;
-			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
-			Chart.adjustScaleDomain(this._xScale, this._xAxisLeft, this._xAxisLeftGroup, d3.extent(this._xScale.domain()));
+			Chart.adjustScaleDomain(this._xScale, this._xAxisTop, this._xAxisTopGroup);
+			Chart.adjustScaleDomain(this._xScale, this._xAxisBottom, this._xAxisBottomGroup);
+			if (this._dotSelection) this._dotSelection.attr("cx", (d, i)=>this._xScale(d[0]));
 			return this;
 		} else {
 			return this._xScale;
@@ -85,8 +88,9 @@ class Scatterplot extends Chart {
 	yScale(scale) {
 		if (scale) {
 			this._yScale = scale;
-			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
-			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup, d3.extent(this._yScale.domain()));
+			Chart.adjustScaleDomain(this._yScale, this._yAxisLeft, this._yAxisLeftGroup);
+			Chart.adjustScaleDomain(this._yScale, this._yAxisRight, this._yAxisRightGroup);
+			if (this._dotSelection) this._dotSelection.attr("cy", (d, i)=>this._yScale(d[1]));
 			return this;
 		} else {
 			return this._yScale;
@@ -132,6 +136,9 @@ class Scatterplot extends Chart {
 		Chart.addIfNull(attributes, "cx", (d, i)=>(this._xScale(d[0])));
 		Chart.addIfNull(attributes, "cy", (d, i)=>(this._yScale(d[1])));
 		Chart.addIfNull(attributes, "r", "4px");
+		
+		this._attributes.cx = attributes.cx;
+		this._attributes.cy = attributes.cy;
 		
 		//Adjusting the scales and axis
 		let minMaxX = d3.extent(dataset.map((d, i)=>this._xScale.invert(attributes.cx(d, i))));

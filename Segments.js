@@ -88,7 +88,7 @@ class Segments extends Chart {
 		if (scale) {
 			this._xAxisScale = scale;
 			this._xScale.domain([0, scale.domain().length-1]);
-			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup, this._xAxisScale.domain());
+			Chart.adjustScaleDomain(this._xAxisScale, this._xAxis, this._xAxisGroup);
 			return this;
 		} else {
 			return this._xScale;
@@ -103,7 +103,7 @@ class Segments extends Chart {
 	yScale(scale) {
 		if (scale) {
 			this._yScale = scale;
-			Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup, d3.extent(this._yScale.domain()));
+			Chart.adjustScaleDomain(this._yScale, this._yAxis, this._yAxisGroup);
 			return this;
 		} else {
 			return this._yScale;
