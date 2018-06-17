@@ -1623,7 +1623,7 @@ class StarGlyph extends Chart {
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._ellipseSelection, attributes, null);
-		Chart.insertAttributesEvents(this._ellipseSelection, null, onEvents);
+		Chart.insertAttributesEvents(this._cellSelection, null, onEvents);
 		
 		return this;
 	}
