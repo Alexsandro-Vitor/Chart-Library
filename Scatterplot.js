@@ -147,7 +147,7 @@ class Scatterplot extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("dot" + i));
-		attributes["class"] = "dot";
+		attributes.class = "dot";
 		Chart.addIfNull(attributes, "cx", (d, i)=>(this._xScale(d[0])));
 		Chart.addIfNull(attributes, "cy", (d, i)=>(this._yScale(d[1])));
 		Chart.addIfNull(attributes, "r", "4px");

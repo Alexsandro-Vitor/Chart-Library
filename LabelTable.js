@@ -1,5 +1,5 @@
 /**
- * Class that represents a Label table.
+ * Class that represents a Label table. It can be attached to any Chart with the chart.labelTable() function.
  * @extends Chart
  */
 class LabelTable extends Chart {

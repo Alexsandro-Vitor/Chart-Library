@@ -1,5 +1,5 @@
 /**
- * Class that represents a Pie chart.
+ * Class that represents a Pie chart. Used to represent proportions.
  * @extends Chart
  */
 class Pie extends Chart {
@@ -108,7 +108,7 @@ class Pie extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("slice" + i));
-		attributes["class"] = "slice";
+		attributes.class = "slice";
 		Chart.addIfNull(attributes, "d", (d, i)=>(this.genSlice(d, i)()));
 		
 		//Slice sliceSelection and color setting
@@ -133,7 +133,7 @@ class Pie extends Chart {
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
-		attributes["class"] = "sliceLabel";
+		attributes.class = "sliceLabel";
 		Chart.addIfNull(attributes, "x", (d, i)=>(centroids[i][0]));
 		Chart.addIfNull(attributes, "y", (d, i)=>(centroids[i][1]));
 		Chart.addIfNull(attributes, "text-anchor", "middle");

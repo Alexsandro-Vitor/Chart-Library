@@ -1,5 +1,5 @@
 /**
- * Class that represents a Star Glyph.
+ * Class that represents a Star Glyph. Used to represent multiple variables of a single sample.
  * @extends Chart
  */
 class StarGlyph extends Chart {
@@ -107,7 +107,7 @@ class StarGlyph extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("polygon" + i));
-		attributes["class"] = "polygon";
+		attributes.class = "polygon";
 		Chart.addIfNull(attributes, "d", (d, i)=>(this._pathGenerator(d, i)));
 		
 		dataset.push(dataset[0]);	//With this, the path will be closed
@@ -132,7 +132,7 @@ class StarGlyph extends Chart {
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
-		attributes["class"] = "cornerLabel";
+		attributes.class = "cornerLabel";
 		Chart.addIfNull(attributes, "x", (d, i)=>(Math.sin(this._getAngle(i)) * radius));
 		Chart.addIfNull(attributes, "y", (d, i)=>(-Math.cos(this._getAngle(i)) * radius));
 		Chart.addIfNull(attributes, "text-anchor", (d, i)=>this._getTextAnchor(i));

@@ -144,7 +144,7 @@ class Map extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>d.properties.L1);
-		attributes["class"] = "mapPath";
+		attributes.class = "mapPath";
 		Chart.addIfNull(attributes, "d", (d, i)=>this._geoPath(d.geometry));
 		
 		this._pathSelection = this._selection.selectAll(".mapPath").data(geojson.features).enter().append("path")
@@ -188,7 +188,7 @@ class Map extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("dot" + i));
-		attributes["class"] = "mapDot";
+		attributes.class = "mapDot";
 		Chart.addIfNull(attributes, "r", "3px");
 		Chart.addIfNull(attributes, "cx", 10);
 		Chart.addIfNull(attributes, "cy", 10);

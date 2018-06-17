@@ -129,7 +129,7 @@ class Histogram extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("col" + this._xAxisScale.domain()[i+1]));
-		attributes["class"] = "column";
+		attributes.class = "column";
 		Chart.addIfNull(attributes, "x", (d, i)=>(this._xScale(i) - colWidth/2));
 		Chart.addIfNull(attributes, "y", (d, i)=>(this._yScale(d)));
 		Chart.addIfNull(attributes, "width", colWidth);
