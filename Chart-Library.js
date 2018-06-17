@@ -328,7 +328,7 @@ class Histogram extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("col" + this._xAxisScale.domain()[i+1]));
-		attributes["class"] = "column";
+		attributes.class = "column";
 		Chart.addIfNull(attributes, "x", (d, i)=>(this._xScale(i) - colWidth/2));
 		Chart.addIfNull(attributes, "y", (d, i)=>(this._yScale(d)));
 		Chart.addIfNull(attributes, "width", colWidth);
@@ -358,7 +358,7 @@ class Histogram extends Chart {
 }
 
 /**
- * Class that represents a Segment chart.
+ * Class that represents a Segment chart. Can also be used to create stream graphs with the segments.setRanges() function.
  * @extends Chart
  */
 class Segments extends Chart {
@@ -566,7 +566,7 @@ class Segments extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("seg" + i));
-		attributes["class"] = "segment";
+		attributes.class = "segment";
 		Chart.addIfNull(attributes, "d", (d, i)=>(this.segPathGenerator(d)));
 		Chart.addIfNull(attributes, "stroke", "black");
 		
@@ -605,16 +605,14 @@ class Segments extends Chart {
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
-		Chart.addIfNull(attributes, "id", (d, i)=>("dotGroup" + i));
-		attributes["class"] = "dotGroup";
 		Chart.addIfNull(attributes, "r", "5px");
 		Chart.addIfNull(attributes, "cx", (d, i)=>this._xScale(i));
 		Chart.addIfNull(attributes, "cy", (d, i)=>this._yScale(d));
 		
 		//Creating the groups
 		this._dotSelection = this._dotLayer.selectAll(".dotGroup").data(dataset).enter().append("g")
-			.attr("id", attributes["id"])
-			.attr("class", attributes["class"])
+			.attr("id", (d, i)=>("dotGroup" + i))
+			.attr("class", "dotGroup")
 			.attr("fill", (d, i)=>(thisChart._dotColorScale(i % thisChart._dotColorScale.domain().length)))
 			.selectAll(".groupDot").data(d=>d).enter().append("circle");
 		
@@ -622,8 +620,8 @@ class Segments extends Chart {
 		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(this.segPathGenerator(d)));
 		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(this.rangePathGenerator(d)));
 		
-		attributes["id"] = (d, i)=>("dot_" + this._xAxisScale.domain()[i]);
-		attributes["class"] = "groupDot";
+		attributes.id = (d, i)=>("dot_" + this._xAxisScale.domain()[i]);
+		attributes.class = "groupDot";
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._dotSelection, attributes, onEvents);
@@ -652,7 +650,7 @@ class Segments extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("range" + i));
-		attributes["class"] = "range";
+		attributes.class = "range";
 		Chart.addIfNull(attributes, "d", (d, i)=>(this.rangePathGenerator(d)));
 		
 		this._rangeSelection = this._rangeLayer.selectAll(".range").data(dataset).enter().append("path")
@@ -839,7 +837,7 @@ class Map extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>d.properties.L1);
-		attributes["class"] = "mapPath";
+		attributes.class = "mapPath";
 		Chart.addIfNull(attributes, "d", (d, i)=>this._geoPath(d.geometry));
 		
 		this._pathSelection = this._selection.selectAll(".mapPath").data(geojson.features).enter().append("path")
@@ -883,7 +881,7 @@ class Map extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("dot" + i));
-		attributes["class"] = "mapDot";
+		attributes.class = "mapDot";
 		Chart.addIfNull(attributes, "r", "3px");
 		Chart.addIfNull(attributes, "cx", 10);
 		Chart.addIfNull(attributes, "cy", 10);
@@ -1063,7 +1061,7 @@ class Scatterplot extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("dot" + i));
-		attributes["class"] = "dot";
+		attributes.class = "dot";
 		Chart.addIfNull(attributes, "cx", (d, i)=>(this._xScale(d[0])));
 		Chart.addIfNull(attributes, "cy", (d, i)=>(this._yScale(d[1])));
 		Chart.addIfNull(attributes, "r", "4px");
@@ -1100,7 +1098,7 @@ class Scatterplot extends Chart {
 }
 
 /**
- * Class that represents a Pie chart.
+ * Class that represents a Pie chart. Used to represent proportions.
  * @extends Chart
  */
 class Pie extends Chart {
@@ -1209,7 +1207,7 @@ class Pie extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("slice" + i));
-		attributes["class"] = "slice";
+		attributes.class = "slice";
 		Chart.addIfNull(attributes, "d", (d, i)=>(this.genSlice(d, i)()));
 		
 		//Slice sliceSelection and color setting
@@ -1234,7 +1232,7 @@ class Pie extends Chart {
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
-		attributes["class"] = "sliceLabel";
+		attributes.class = "sliceLabel";
 		Chart.addIfNull(attributes, "x", (d, i)=>(centroids[i][0]));
 		Chart.addIfNull(attributes, "y", (d, i)=>(centroids[i][1]));
 		Chart.addIfNull(attributes, "text-anchor", "middle");
@@ -1282,7 +1280,7 @@ class Pie extends Chart {
 }
 
 /**
- * Class that represents a Star Glyph.
+ * Class that represents a Star Glyph. Used to represent multiple variables of a single sample.
  * @extends Chart
  */
 class StarGlyph extends Chart {
@@ -1390,7 +1388,7 @@ class StarGlyph extends Chart {
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("polygon" + i));
-		attributes["class"] = "polygon";
+		attributes.class = "polygon";
 		Chart.addIfNull(attributes, "d", (d, i)=>(this._pathGenerator(d, i)));
 		
 		dataset.push(dataset[0]);	//With this, the path will be closed
@@ -1415,7 +1413,7 @@ class StarGlyph extends Chart {
 		
 		//Mandatory attributes
 		if (attributes == null) attributes = [];
-		attributes["class"] = "cornerLabel";
+		attributes.class = "cornerLabel";
 		Chart.addIfNull(attributes, "x", (d, i)=>(Math.sin(this._getAngle(i)) * radius));
 		Chart.addIfNull(attributes, "y", (d, i)=>(-Math.cos(this._getAngle(i)) * radius));
 		Chart.addIfNull(attributes, "text-anchor", (d, i)=>this._getTextAnchor(i));
@@ -1466,7 +1464,223 @@ class StarGlyph extends Chart {
 }
 
 /**
- * Class that represents a Label table.
+ * Class that represents a Correlation chart. It is used for plotting the correlation between any two variables of a dataset.
+ * @extends Chart
+ */
+ class Correlation extends Chart {
+	/**
+	 * @constructor
+	 * @param {d3.selection} container - The tag in which the chart will be inserted.
+	 * @param {string} id - The id of the chart tag.
+	 * @param {Object} position - The position of the chart.
+	 * @param {number} position.x - The X coordinate of the chart.
+	 * @param {number} position.y - The Y coordinate of the chart.
+	 * @param {(number|Object)} margins - The margins of the chart. If a number is passed, all its values will be the same.
+	 * @param {number} margins.left - Left margin of the chart.
+	 * @param {number} margins.right - Right margin of the chart.
+	 * @param {number} margins.top - Upper margin of the chart.
+	 * @param {number} margins.bottom - Lower margin of the chart.
+	 * @param {Object} dimensions - The dimensions of the chart.
+	 * @param {number} dimensions.width - The width of the chart, counting the margins.
+	 * @param {number} dimensions.height - The height of the chart, counting the margins.
+	 */
+	 constructor(container, id, position, margins, dimensions) {
+		super(container, id, position, margins, dimensions, "correlationChart");
+		
+		this._rowLabelSelection = null;
+		this._colLabelSelection = null;
+		
+		this._ellipseSelection = null;
+		this._cellSelection = null;
+		
+		this._colorScheme = d3.interpolateRdYlBu;
+	}
+	
+	/**
+	 * Returns the selection of the labels of the rows.
+	 * @returns {d3.selection} The row labels of this chart.
+	 */
+	rowLabelSelection() {
+		return this._rowLabelSelection;
+	}
+	
+	/**
+	 * Returns the selection of the labels of the columns.
+	 * @returns {d3.selection} The column labels of this chart.
+	 */
+	colLabelSelection() {
+		return this._colLabelSelection;
+	}
+	
+	/**
+	 * Returns the selection of the ellipses of the chart.
+	 * @returns {d3.selection} The ellipses of this chart.
+	 */
+	ellipseSelection() {
+		return this._ellipseSelection;
+	}
+	
+	/**
+	 * Returns the selection of the cells of the chart.
+	 * @returns {d3.selection} The cells of this chart.
+	 */
+	cellSelection() {
+		return this._cellSelection;
+	}
+	
+	/**
+	 * The color scheme used at the chart. Uses d3.interpolateRdYlBu by default. If a scale is given sets the colorScheme, otherwise returns the current colorScheme.
+	 * @param {d3.scale} scheme - The new colorScheme.
+	 * @returns {(Correlation|d3.scale)} This object or the current colorScheme.
+	 */
+	colorScheme(scheme) {
+		if (scheme) {
+			this._colorScheme = scheme;
+			return this;
+		} else {
+			return this._colorScheme;
+		}
+	}
+	
+	/** 
+	 * Sets the labels for rows and columns.
+	 * @param {number[][]} names - The names of the dataset attributes.
+	 * @param {Object} attributes - An object containing functions or constants for the labels.
+	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Correlation} This chart.
+	 */
+	setLabels(names, attributes, onEvents) {
+		//Mandatory attributes
+		if (attributes == null) attributes = [];
+		attributes.class = "rowLabel";
+		Chart.addIfNull(attributes, "text-anchor", "end");
+		attributes["dominant-baseline"] = "hanging";
+		attributes.transform = (d, i)=>("translate(0, "+((i+1/2) * this._height / names.length)+")rotate(45)");
+		
+		this._rowLabelSelection = this._selection.selectAll(".rowLabel").data(names).enter().append("text")
+			.text(d=>d);
+		
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this._rowLabelSelection, attributes, null);
+		
+		attributes.class = "colLabel";
+		attributes["dominant-baseline"] = "bottom";
+		attributes.transform = (d, i)=>("translate("+((i+1/2) * this._width / names.length)+", 0)rotate(45)");
+		
+		this._colLabelSelection = this._selection.selectAll(".colLabel").data(names).enter().append("text")
+			.text(d=>d);
+		
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this._colLabelSelection, attributes, onEvents);
+		
+		return this;
+	}
+	
+	/** 
+	 * Plots the correlation table of the dataset.
+	 * @param {number[][]} dataset - The dataset which correlation will be calculated.
+	 * @param {Object} attributes - An object containing functions or constants for the ellipses that represent the correlations.
+	 * @param {Object} onEvents - An object containing functions for events.
+	 * @returns {Correlation} This chart.
+	 */
+	setData(dataset, attributes, onEvents) {
+		let thisChart = this;
+		let correlations = Correlation.pearson(dataset);
+		let posScale = d3.scaleLinear()
+			.domain([-1, 0, 1])
+			.range([0.0000001, 1, Math.sqrt(2)]);
+		
+		//Mandatory attributes
+		if (attributes == null) attributes = [];
+		attributes.id = (d, i)=>("ellipse_" + i);
+		attributes.class = "groupEllipse";
+		attributes.rx = (d, i)=>(posScale(d) * d3.min([this._height, this._width]) / (2 * dataset[0].length));
+		attributes.ry = (d, i)=>(posScale(-d) * d3.min([this._width, this._height]) / (2 * dataset[0].length));
+		attributes.transform = (d, i)=>("translate(" + (i * this._width / dataset[0].length) + ", 0)rotate(-45)");
+		Chart.addIfNull(attributes, "stroke", (d, i)=>thisChart._colorScheme((d+1)/2));
+		
+		let rowTransform = (d, i)=>("translate(" + (this._width / (2 * dataset[0].length)) + "," + ((i + 1/2) * this._height / dataset[0].length) + ")");
+		this._ellipseSelection = this._selection.selectAll(".ellipseGroup").data(correlations).enter().append("g")
+			.attr("id", (d, i)=>("ellipseGroup" + i))
+			.attr("class", "ellipseGroup")
+			.attr("transform", rowTransform)
+			.selectAll(".groupEllipse").data(d=>d).enter().append("ellipse")
+				.attr("fill", (d, i)=>thisChart._colorScheme((d+1)/2));
+		
+		rowTransform = (d, i)=>("translate(0," + (i * this._height / dataset[0].length) + ")");
+		this._cellSelection = this._selection.selectAll(".rectGroup").data(correlations).enter().append("g")
+			.attr("id", (d, i)=>("rectGroup_" + i))
+			.attr("class", "rectGroup")
+			.attr("transform", rowTransform)
+			.selectAll(".groupRect").data(d=>d).enter().append("rect")
+				.attr("id", (d, i)=>"rect_" + i)
+				.attr("class", "groupRect")
+				.attr("x", (d, i)=>(i * this._width / dataset[0].length))
+				.attr("width", this._width / dataset[0].length)
+				.attr("height", this._height / dataset[0].length)
+				.attr("stroke", "black")
+				.attr("fill", "transparent");
+		
+		//Insertion of attributes and events
+		Chart.insertAttributesEvents(this._ellipseSelection, attributes, null);
+		Chart.insertAttributesEvents(this._ellipseSelection, null, onEvents);
+		
+		return this;
+	}
+	
+	/**
+	 * Generates a table of correlation values using the Pearson algorithm.
+	 * @param {number[][]} dataset - The dataset which correlation will be calculated.
+	 * @returns [number[][]} The correlation table of the dataset.
+	 */
+	static pearson(dataset) {
+		//Mean calculation
+		let means = new Array(dataset[0].length);
+		for (let i = 0; i < dataset[0].length; i++) {
+			means[i] = d3.mean(dataset.map(d=>d[i]));
+		}
+		
+		//Correlation
+		let output = new Array(dataset[0].length);
+		for (let i = 0; i < dataset[0].length; i++) {
+			output[i] = new Array(dataset[0].length);
+			for (let j = 0; j < dataset[0].length; j++) {
+				let covariance = d3.sum(dataset.map(d=>(d[i] - means[i]) * (d[j] - means[j])));
+				let stdDeviationI = d3.sum(dataset.map(d=>(d[i] - means[i]) * (d[i] - means[i])));
+				let stdDeviationJ = d3.sum(dataset.map(d=>(d[j] - means[j]) * (d[j] - means[j])));
+				output[i][j] = covariance / Math.sqrt(stdDeviationI * stdDeviationJ);
+			}
+		}
+		return output;
+	}
+	
+	/** 
+	 * Clears the chart, removing all plottings.
+	 * @returns {Correlation} This chart.
+	 */
+	clear() {
+		if (this._rowLabelSelection) {
+			this._rowLabelSelection.remove();
+			this._rowLabelSelection = null;
+		}
+		if (this._colLabelSelection) {
+			this._colLabelSelection.remove();
+			this._colLabelSelection = null;
+		}
+		if (this._ellipseSelection) {
+			this._ellipseSelection.remove();
+			this._ellipseSelection = null;
+		}
+		if (this._cellSelection) {
+			this._cellSelection.remove();
+			this._cellSelection = null;
+		}
+		return super.clear();
+	}
+}
+
+/**
+ * Class that represents a Label table. It can be attached to any Chart with the chart.labelTable() function.
  * @extends Chart
  */
 class LabelTable extends Chart {
