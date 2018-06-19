@@ -412,11 +412,11 @@ class Segments extends Chart {
 		
 		this._rangeSelection = null;
 		
-		this.segPathGenerator = d3.line()
+		this._segPathGenerator = d3.line()
 			.x((d, i)=>this._xScale(i))
 			.y((d, i)=>this._yScale(d));
 		
-		this.rangePathGenerator = d3.area()
+		this._rangePathGenerator = d3.area()
 			.x((d, i)=>this._xScale(i))
 			.y0((d, i)=>this._yScale(d[0]))
 			.y1((d, i)=>this._yScale(d[1]));
@@ -512,7 +512,7 @@ class Segments extends Chart {
 	 * @param {d3.area} gen - The new rangePathGenerator.
 	 * @returns {(Segments|d3.area)} This object or the current rangePathGenerator.
 	 */
-	rangePathGeneration(gen) {
+	rangePathGenerator(gen) {
 		if (gen) {
 			this._rangePathGenerator = gen;
 			return this;
@@ -567,7 +567,7 @@ class Segments extends Chart {
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("seg" + i));
 		attributes.class = "segment";
-		Chart.addIfNull(attributes, "d", (d, i)=>(this.segPathGenerator(d)));
+		Chart.addIfNull(attributes, "d", (d, i)=>(this._segPathGenerator(d)));
 		Chart.addIfNull(attributes, "stroke", "black");
 		
 		this._segSelection = this._segLayer.selectAll(".segment").data(dataset).enter().append("path")
@@ -579,7 +579,7 @@ class Segments extends Chart {
 				.attr("cx", (d, i)=>this._xScale(i))
 				.attr("cy", (d, i)=>this._yScale(d));
 		}
-		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(this.rangePathGenerator(d)));
+		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(this._rangePathGenerator(d)));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._segSelection, attributes, onEvents);
@@ -617,8 +617,8 @@ class Segments extends Chart {
 			.selectAll(".groupDot").data(d=>d).enter().append("circle");
 		
 		//Updating previous selections
-		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(this.segPathGenerator(d)));
-		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(this.rangePathGenerator(d)));
+		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(this._segPathGenerator(d)));
+		if (this._rangeSelection) this._rangeSelection.attr("d", (d, i)=>(this._rangePathGenerator(d)));
 		
 		attributes.id = (d, i)=>("dot_" + this._xAxisScale.domain()[i]);
 		attributes.class = "groupDot";
@@ -651,7 +651,7 @@ class Segments extends Chart {
 		if (attributes == null) attributes = [];
 		Chart.addIfNull(attributes, "id", (d, i)=>("range" + i));
 		attributes.class = "range";
-		Chart.addIfNull(attributes, "d", (d, i)=>(this.rangePathGenerator(d)));
+		Chart.addIfNull(attributes, "d", (d, i)=>(this._rangePathGenerator(d)));
 		
 		this._rangeSelection = this._rangeLayer.selectAll(".range").data(dataset).enter().append("path")
 			.attr("fill", (d, i)=>(thisChart._rangeColorScale(i % thisChart._rangeColorScale.domain().length)));
@@ -662,7 +662,7 @@ class Segments extends Chart {
 				.attr("cx", (d, i)=>this._xScale(i))
 				.attr("cy", (d, i)=>this._yScale(d));
 		}
-		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(this.segPathGenerator(d)));
+		if (this._segSelection) this._segSelection.attr("d", (d, i)=>(this._segPathGenerator(d)));
 		
 		//Insertion of attributes and events
 		Chart.insertAttributesEvents(this._rangeSelection, attributes, onEvents);
