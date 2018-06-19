@@ -2,6 +2,7 @@
 This library contains code for production of some charts using d3 (https://d3js.org/).
 
 Currently the following charts can be made with it:
+* Correlations
 * Histograms
 * Maps
 * Pie Charts
@@ -18,6 +19,16 @@ The full documentation is available at: https://alexsandro-vitor.github.io/Chart
 ### Using the Library
 
 * **Complete version:** Download *Chart-Library.js* or the minified version *Chart-Library.min.js*.
+
+Alternatively, include
+```html
+<script src="http://www.cin.ufpe.br/~avsc/Arquivos/Outros/Chart-Library/Chart-Library.js"></script> 
+```
+or
+```html
+<script src="http://www.cin.ufpe.br/~avsc/Arquivos/Outros/Chart-Library/Chart-Library.min.js"></script> 
+```
+in your .html file.
 * **Individual charts:** Download the Chart.js file and the files you want.
 
 ### Plotting a chart
